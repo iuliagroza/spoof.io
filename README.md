@@ -1,2 +1,2 @@
 # spoof.io
-Detecting spoofing in algorithmic trading using Reinforcement Learning methods
+Detecting spoofing & layering in algorithmic trading using Reinforcement Learning
