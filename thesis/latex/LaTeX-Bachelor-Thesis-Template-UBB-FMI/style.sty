@@ -1,0 +1,108 @@
+% used packages
+\usepackage{geometry}                           % page settings
+\usepackage{palatino}                           % font
+\usepackage[onehalfspacing]{setspace}           % 1.5 distance between lines
+\usepackage[utf8]{inputenc}                     % encoding
+\usepackage{graphicx}                           % images
+\usepackage{url}                                % links
+\usepackage[nottoc, notlof, notlot]{tocbibind}  % table of contents style
+\usepackage[unicode]{hyperref}                  % references from the table of contents
+\usepackage{etoolbox,ifthen} 	                % ifthen type of commands
+\usepackage{kvoptions}	                        % define key/value pairs as options for packages and classes
+
+% package options
+\geometry{  a4paper,        
+            left=3cm,
+            right=2.5cm,
+            top=2.5cm,
+            bottom=2.5cm,
+}
+
+% bib style
+\bibliographystyle{alpha}
+
+% define the boolean variables in which we store the options chosen for the package (language and type of document)
+\newbool{@eng}\setbool{@eng}{false}
+\newbool{@dis}\setbool{@dis}{false}
+\newbool{@lic}\setbool{@lic}{true}
+
+% define and setup the key/value pairs for the package options
+\SetupKeyvalOptions{
+family=std,
+prefix=std@
+}
+\DeclareStringOption[romanian]{language}
+\DeclareStringOption[bachelor]{type}
+\DeclareDefaultOption{%
+\PackageWarning{\@currname}{Unknown option `\CurrentOption'}}
+\ProcessKeyvalOptions*
+\ifthenelse{\equal{\std@language}{romanian}}{\setbool{@eng}{false}}{\setbool{@eng}{true}}
+\ifthenelse{\equal{\std@type}{bachelor}}{\setbool{@lic}{true}\setbool{@dis}{false}}{}
+\ifthenelse{\equal{\std@type}{master}}{\setbool{@dis}{true}\setbool{@lic}{false}}{}
+
+\DeclareRobustCommand*{\specialization}[1]{\gdef\@specialization{#1}}   % define command for specialization
+\DeclareRobustCommand*{\supervisor}[1]{\gdef\@supervisor{#1}}           % define command for scientific advisor
+
+\ifbool{@eng}{\usepackage[english]{babel}}{\usepackage[romanian]{babel}}
+
+% customize the title page
+\renewcommand{\maketitle}
+{
+\begin{titlepage}																					  
+
+\begin{center}
+{\Large\textbf{
+\ifbool{@eng}
+{
+BABEŞ-BOLYAI UNIVERSITY CLUJ-NAPOCA \\
+FACULTY OF MATHEMATICS AND COMPUTER SCIENCE \\
+SPECIALIZATION \@specialization \\
+}
+{
+UNIVERSITATEA BABEŞ-BOLYAI CLUJ-NAPOCA \\
+FACULTATEA DE MATEMATICǍ ŞI INFORMATICǍ \\
+SPECIALIZAREA  \@specialization \\
+}
+}}
+\end{center}
+
+\vspace{10em}
+
+\begin{center}
+{\Huge\textbf{
+\ifbool{@dis}{\ifbool{@eng}{DISSERTATION THESIS}{LUCRARE DE DISERTA\c TIE}}{}
+\ifbool{@lic}{\ifbool{@eng}{DIPLOMA THESIS}{LUCRARE DE LICEN\c T\u A}}{}
+}}
+\end{center}
+
+\vspace{3em}
+
+\begin{center}
+{\huge\textbf{\@title}}
+\end{center}
+
+\vspace{10em}
+
+\begin{flushleft}
+{\Large\textbf{
+\ifbool{@eng}{Supervisor}{Conducător științific} \\ \@supervisor
+}}
+\end{flushleft}
+
+\vspace{3em}
+
+\begin{flushright}
+{\Large\textit{
+\ifbool{@eng}{Author}{Absolvent}\\ \@author
+}}
+\end{flushright}
+
+\vfill
+
+\begin{center}
+{\Large{\the\year}}
+\end{center}
+
+\end{titlepage}
+}
+
