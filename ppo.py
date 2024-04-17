@@ -38,6 +38,8 @@ class PPOAgent:
         self.action_dim = action_dim
         self.hidden_dim = hidden_dim
         self.learning_rate = learning_rate
+        self.gamma = gamma
+        self.lmbda = lmbda
 
         self.policy = PolicyNetwork(self.state_dim, self.action_dim, self.hidden_dim)
         self.value = ValueNetwork(self.state_dim, self.hidden_dim)
@@ -52,16 +54,16 @@ class PPOAgent:
         log_prob = dist.log_prob(action)
         return action.item(), log_prob.item()
 
-    def compute_advantage(rewards, values, gamma, lamda):
+    def compute_advantage(self, rewards, values):
         values = values + [0]
         advantage = [0]
         R = 0
         for i in reversed(range(len(rewards))):
-            R = rewards[i] + gamma * R
+            R = rewards[i] + self.gamma * R
             advantage.append(R - values[i])
         return advantage[::-1]
 
-    def update(self, policy, value, batch_size, gamma, lamda):
+    def update(self, policy, value, batch_size):
         for _ in range(batch_size):
             rewards, values, log_probs, actions = [], [], [], []
 
@@ -76,7 +78,7 @@ class PPOAgent:
                 if done:
                     break
 
-            advantage = self.compute_advantage(rewards, values, gamma, lamda)
+            advantage = self.compute_advantage(rewards, values, self.gamma, self.lmbda)
 
             policy_loss = []
             for log_prob, adv in zip(log_probs, advantage):
