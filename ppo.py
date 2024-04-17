@@ -85,7 +85,7 @@ class PPOAgent:
                 policy_loss.append(-log_prob * adv)
             policy_loss = torch.cat(policy_loss)
 
-# Hyperparameters
+# Hyperparameters Setup
 state_dim = 4
 action_dim = 64
 hidden_dim = 2
