@@ -33,11 +33,11 @@ class ValueNetwork(nn.Module):
         return x
 
 class PPOAgent:
-    def __init__(self, input_size, hidden_size, output_size, lr, gamma, lmbda, eps_clip):
-        self.state_dim = 4
-        self.action_dim = 64
-        self.hidden_dim = 2
-        self.learning_rate = 0.2
+    def __init__(self, state_dim, hidden_dim, action_dim, learning_rate, gamma=1, lmbda=0.9, eps_clip=3):
+        self.state_dim = state_dim
+        self.action_dim = action_dim
+        self.hidden_dim = hidden_dim
+        self.learning_rate = learning_rate
 
         self.policy = PolicyNetwork(self.state_dim, self.action_dim, self.hidden_dim)
         self.value = ValueNetwork(self.state_dim, self.hidden_dim)
@@ -82,3 +82,11 @@ class PPOAgent:
             for log_prob, adv in zip(log_probs, advantage):
                 policy_loss.append(-log_prob * adv)
             policy_loss = torch.cat(policy_loss)
+
+# Hyperparameters
+state_dim = 4
+action_dim = 64
+hidden_dim = 2
+learning_rate = 0.2
+
+ppo = PPOAgent(state_dim, action_dim, hidden_dim, learning_rate)
