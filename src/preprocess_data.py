@@ -11,8 +11,6 @@ def add_time_features(data):
     data["time"] = pd.to_datetime(data["time"])
     data["hour_of_day"] = data["time"].dt.hour
     
-    # Normalize hour, range [16, 20]
-    data["hour_of_day"] = (data["hour_of_day"] - 16) / 4
     return data
 
 def preprocess_full_channel_data(data):
@@ -24,25 +22,30 @@ def preprocess_full_channel_data(data):
     # Feature Engineering
     data["remaining_size_change"] = data.groupby("order_id")["remaining_size"].diff().fillna(0)
     
-    # Normalize numeric columns and encode categorical variables
-    numeric_features = ["price", "size", "remaining_size", "remaining_size_change", "hour_of_day"]
+    # Normalize numeric columns except 'hour_of_day'
+    numeric_features = ["price", "size", "remaining_size", "remaining_size_change"]
+    numeric_transformer = Pipeline(steps=[
+        ("imputer", SimpleImputer(strategy="median")),
+        ("scaler", MinMaxScaler())])
+    
+    # Encode categorical variables
     categorical_features = ["type", "side", "reason"]
+    categorical_transformer = Pipeline(steps=[
+        ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
+        ("onehot", OneHotEncoder(handle_unknown="ignore"))])
+    
+    # Column transformer for applying transformations to specific columns
     preprocessor = ColumnTransformer(
         transformers=[
-            ("num", Pipeline(steps=[
-                ("imputer", SimpleImputer(strategy="median")),
-                ("scaler", MinMaxScaler())
-            ]), numeric_features),
-            ("cat", Pipeline(steps=[
-                ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
-                ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False))
-            ]), categorical_features)
-        ])
+            ("num", numeric_transformer, numeric_features),
+            ("cat", categorical_transformer, categorical_features)])
 
-    # Fit and transform data
+    # Apply transformations
     data_processed = preprocessor.fit_transform(data)
-    new_columns = numeric_features + list(preprocessor.named_transformers_["cat"].named_steps["onehot"].get_feature_names_out(categorical_features))
-    data_processed = pd.DataFrame(data_processed, columns=new_columns)
+    data_processed = pd.DataFrame(data_processed, columns=numeric_features + list(preprocessor.named_transformers_["cat"].named_steps["onehot"].get_feature_names_out(categorical_features)))
+    
+    # Merge 'hour_of_day' back into the processed data
+    data_processed['hour_of_day'] = data['hour_of_day'].reset_index(drop=True)
     
     return data_processed
 
@@ -53,7 +56,7 @@ def preprocess_ticker_data(data):
     
     # Normalize the numeric columns
     scaler = MinMaxScaler()
-    numeric_cols = ["price", "open_24h", "volume_24h", "high_24h", "volume_30d", "best_bid", "best_ask", "last_size", "hour_of_day"]
+    numeric_cols = ["price", "open_24h", "volume_24h", "high_24h", "volume_30d", "best_bid", "best_ask", "last_size"]
     data[numeric_cols] = scaler.fit_transform(data[numeric_cols])
 
     data = pd.get_dummies(data, columns=["side"], drop_first=False)
