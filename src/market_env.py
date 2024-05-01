@@ -25,9 +25,9 @@ class MarketEnvironment:
         self.current_index = self.history_t
         self.done = False
         # Combining features from both datasets at reset
-        full_features = self.full_channel_data.iloc[self.current_index - self.history_t:self.current_index]
-        ticker_features = self.ticker_data.iloc[self.current_index - self.history_t:self.current_index]
-        return full_features.values.flatten(), ticker_features.values.flatten()
+        full_features = self.full_channel_data.iloc[self.current_index - self.history_t:self.current_index].values.flatten()
+        ticker_features = self.ticker_data.iloc[self.current_index - self.history_t:self.current_index].values.flatten()
+        return np.concatenate([full_features, ticker_features])
 
     def step(self, action):
         # Calculate anomaly score based on current state
@@ -40,12 +40,11 @@ class MarketEnvironment:
             self.done = True
 
         if not self.done:
-            full_features = self.full_channel_data.iloc[self.current_index - self.history_t:self.current_index]
-            ticker_features = self.ticker_data.iloc[self.current_index - self.history_t:self.current_index]
-            next_state = (full_features.values.flatten(), ticker_features.values.flatten())
+            full_features = self.full_channel_data.iloc[self.current_index - self.history_t:self.current_index].values.flatten()
+            ticker_features = self.ticker_data.iloc[self.current_index - self.history_t:self.current_index].values.flatten()
+            next_state = np.concatenate([full_features, ticker_features])  # Concatenated array
         else:
-            next_state = (None, None)
-
+            next_state = None
         return next_state, reward, self.done
 
     def calculate_anomaly_score(self, index):
