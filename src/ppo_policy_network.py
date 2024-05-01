@@ -3,14 +3,10 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 import pandas as pd
-from torch.distributions import Categorical
-from torch.utils.data import DataLoader, Dataset
-from collections import deque
-import random
 
 # Simulation environment
 class MarketEnvironment:
-    def __init__(self, data, initial_index=0, history_t=10):
+    def __init__(self, data, initial_index=10, history_t=10):
         self.data = data
         self.current_index = initial_index
         self.history_t = history_t
@@ -19,36 +15,50 @@ class MarketEnvironment:
     def reset(self):
         self.current_index = self.history_t
         self.done = False
-        return self.data.iloc[self.current_index - self.history_t:self.current_index].values.flatten()
+        initial_state = self.data.iloc[self.current_index - self.history_t:self.current_index]
+        return initial_state.values.flatten()
 
     def step(self, action):
+        # Fetch current market data point
+        current_data = self.data.iloc[self.current_index]
+
         # Calculate anomaly score based on current state
-        anomaly_score = self.calculate_anomaly_score(self.current_index)
+        anomaly_score = self.calculate_anomaly_score(current_data)
 
-        spoofing_threshold = 0.8  # this is an example threshold
+        # Example threshold, adjust based on analysis or during hyperparameter tuning
+        spoofing_threshold = 0.8
 
+        # Determine if the current state is considered spoofing
         is_spoofing = anomaly_score > spoofing_threshold
         reward = 0
 
-        if action == 1 and is_spoofing:  # Correct detection of spoofing
-            reward = 1
-        elif action == 0 and not is_spoofing:  # Correctly identified normal behavior
-            reward = 1
+        # Assign rewards based on action correctness
+        if action == 1 and is_spoofing:
+            reward = 1  # Correctly flagged spoofing
+        elif action == 0 and not is_spoofing:
+            reward = 1  # Correctly flagged normal behavior
         else:
-            reward = -1  # Incorrect classification
+            reward = -1  # Incorrect action
 
+        # Update to the next state
         self.current_index += 1
-        
-        if self.current_index >= len(self.data):
-            self.done = True
-        
-        next_state = self.data.iloc[self.current_index - self.history_t:self.current_index].values.flatten()
-        return next_state, reward, self.done
+        self.done = self.current_index >= len(self.data)
+        if not self.done:
+            next_state = self.data.iloc[self.current_index - self.history_t:self.current_index]
+            return next_state.values.flatten(), reward, self.done
+        else:
+            return np.zeros(self.data.shape[1] * self.history_t), reward, self.done
 
-    def calculate_anomaly_score(self, index):
-        # Implement your anomaly detection logic here
-        # This could involve checking order imbalances, sudden price changes, etc.
+    def calculate_anomaly_score(self, current_data):
+        # Define how anomaly score is calculated using the current data point
+        order_flow_imbalance = abs(current_data['order_flow_imbalance'])
+        cancel_to_received_ratio = current_data['cancel_to_received_ratio']
+        price_fluctuations = np.std([current_data[f'price_{i}_std'] for i in (5, 10, 15)])
+
+        # Example weighted sum of factors
+        anomaly_score = 0.3 * order_flow_imbalance + 0.4 * cancel_to_received_ratio + 0.3 * price_fluctuations
         return anomaly_score
+
 
 
 # PPO Policy Network

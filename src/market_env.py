@@ -1,0 +1,74 @@
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+class MarketEnvironment:
+    def __init__(self, full_channel_path=None, ticker_path=None, initial_index=0, history_t=10):
+        self.full_channel_data, self.ticker_data = self.load_data(full_channel_path, ticker_path)
+        self.current_index = initial_index
+        self.history_t = history_t
+        self.done = False
+
+        # TODO: Hypertune
+        self.spoofing_threshold = 0.8  # Dynamically adjusted based on the model performance
+
+    def load_data(self, full_channel_path, ticker_path):
+        full_channel = pd.read_csv(full_channel_path) if full_channel_path else pd.DataFrame()
+        ticker = pd.read_csv(ticker_path) if ticker_path else pd.DataFrame()
+        return full_channel, ticker
+
+    def reset(self):
+        self.current_index = self.history_t
+        self.done = False
+        # Combining features from both datasets at reset
+        full_features = self.full_channel_data.iloc[self.current_index - self.history_t:self.current_index]
+        ticker_features = self.ticker_data.iloc[self.current_index - self.history_t:self.current_index]
+        return full_features.values.flatten(), ticker_features.values.flatten()
+
+    def step(self, action):
+        # Calculate anomaly score based on current state
+        anomaly_score = self.calculate_anomaly_score(self.current_index)
+        is_spoofing = anomaly_score > self.spoofing_threshold
+        reward = 1 if (action == 1 and is_spoofing) or (action == 0 and not is_spoofing) else -1
+
+        self.current_index += 1
+        if self.current_index >= len(self.full_channel_data) or self.current_index >= len(self.ticker_data):
+            self.done = True
+
+        if not self.done:
+            full_features = self.full_channel_data.iloc[self.current_index - self.history_t:self.current_index]
+            ticker_features = self.ticker_data.iloc[self.current_index - self.history_t:self.current_index]
+            next_state = (full_features.values.flatten(), ticker_features.values.flatten())
+        else:
+            next_state = (None, None)
+
+        return next_state, reward, self.done
+
+    def calculate_anomaly_score(self, index):
+        full_row = self.full_channel_data.iloc[index]
+        ticker_row = self.ticker_data.iloc[index]
+
+        weights = {
+            'order_flow_imbalance': 0.3,
+            'spread': 0.4,  # Using spread directly from ticker
+            'cancel_to_received_ratio': 0.3
+        }
+        scores = {
+            'order_flow_imbalance': np.log1p(abs(full_row['order_flow_imbalance'])),
+            'spread': np.log1p(abs(ticker_row['spread'])) if ticker_row['spread'] != 0 else 0,
+            'cancel_to_received_ratio': np.log1p(full_row['cancel_to_received_ratio'])
+        }
+        anomaly_score = sum(weights[k] * scores[k] for k in weights)
+        return anomaly_score
+
+if __name__ == "__main__":
+    env = MarketEnvironment("../data/processed/full_channel_enhanced.csv", "../data/processed/ticker_enhanced.csv")
+    state = env.reset()
+    while not env.done:
+        action = np.random.choice([0, 1])  # Randomly choose action
+        state, reward, done = env.step(action)
+        print(f"Reward: {reward}, New State: {state if state is not None else 'End of Data'}")
