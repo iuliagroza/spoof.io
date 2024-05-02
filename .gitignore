@@ -1,3 +1,4 @@
 .DS_Store
 spoof
 __pycache__
+*.log

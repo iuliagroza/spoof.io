@@ -4,15 +4,12 @@ class Config:
     API_TITLE = 'spoof.io - Spoofing and Layering Detection API'
     API_DESCRIPTION = 'API for real-time detection of spoofing and layering in algorithmic trading using PPO.'
 
-    # Logging Configuration
-    LOG_LEVEL = 'INFO'
-    LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
-
     # Paths
     RAW_DATA_PATH = 'data/raw/'
     PROCESSED_DATA_PATH = 'data/processed/'
     MISC_DATA_PATH = 'data/misc/'
     MODEL_SAVE_PATH = 'models/'
+    OUTPUT_PATH = 'output/'
 
     # Full channel paths
     FULL_CHANNEL_RAW_17HR_PATH = RAW_DATA_PATH + 'FullChannel_GDAX_20220511_17hr.json'
@@ -29,6 +26,11 @@ class Config:
     TICKER_RAW_PATH = RAW_DATA_PATH + 'ticker.csv'
     TICKER_PROCESSED_PATH = PROCESSED_DATA_PATH + 'ticker_processed.csv'
     TICKER_ENHANCED_PATH = PROCESSED_DATA_PATH + 'ticker_enhanced.csv'
+
+    # Logging Configuration
+    LOG_LEVEL = 'INFO'
+    LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
+    LOG_MARKET_ENV_PATH = OUTPUT_PATH + 'market_env.log'
 
     # Data preprocessing parameters
     CATEGORICAL_COLUMNS = ['type', 'side', 'reason']
