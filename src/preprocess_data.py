@@ -22,9 +22,16 @@ def add_time_features(data):
     Returns:
         pd.DataFrame: The DataFrame with an additional 'hour_of_day' feature.
     """
-    data["time"] = pd.to_datetime(data["time"])
-    data["hour_of_day"] = data["time"].dt.hour
-    return data
+    try:
+        data["time"] = pd.to_datetime(data["time"])
+        data["hour_of_day"] = data["time"].dt.hour
+        return data
+    except KeyError as e:
+        logging.error(f"Error: The 'time' column is missing. {e}")
+        return None
+    except Exception as e:
+        logging.error(f"An error occurred while adding time features. {e}")
+        return None
 
 
 def create_numeric_transformer():
@@ -34,10 +41,14 @@ def create_numeric_transformer():
     Returns:
         Pipeline: A configured pipeline for numeric feature transformations.
     """
-    return Pipeline(steps=[
-        ("imputer", SimpleImputer(strategy="median")),
-        ("scaler", MinMaxScaler())
-    ])
+    try:
+        return Pipeline(steps=[
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", MinMaxScaler())
+        ])
+    except Exception as e:
+        logging.error(f"An error occurred while creating the numeric transformer. {e}")
+        return None
 
 
 def create_categorical_transformer():
@@ -47,10 +58,14 @@ def create_categorical_transformer():
     Returns:
         Pipeline: A configured pipeline for categorical feature transformations.
     """
-    return Pipeline(steps=[
-        ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
-        ("onehot", OneHotEncoder(handle_unknown="ignore"))
-    ])
+    try:
+        return Pipeline(steps=[
+            ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
+            ("onehot", OneHotEncoder(handle_unknown="ignore"))
+        ])
+    except Exception as e:
+        logging.error(f"An error occurred while creating the categorical transformer. {e}")
+        return None
 
 
 def preprocess_full_channel_data(data):
@@ -63,23 +78,32 @@ def preprocess_full_channel_data(data):
     Returns:
         pd.DataFrame: The preprocessed DataFrame ready for model consumption.
     """
-    data = add_time_features(data)
-    data.fillna({"remaining_size": 0, "price": data["price"].mean()}, inplace=True)
-    data["remaining_size_change"] = data.groupby("order_id")["remaining_size"].diff().fillna(0)
+    try:
+        data = add_time_features(data)
+        if data is None:
+            return None
+        data.fillna({"remaining_size": 0, "price": data["price"].mean()}, inplace=True)
+        data["remaining_size_change"] = data.groupby("order_id")["remaining_size"].diff().fillna(0)
 
-    numeric_features = Config.NUMERIC_COLUMNS
-    categorical_features = Config.CATEGORICAL_COLUMNS
+        numeric_features = Config.NUMERIC_COLUMNS
+        categorical_features = Config.CATEGORICAL_COLUMNS
 
-    preprocessor = ColumnTransformer(transformers=[
-        ("num", create_numeric_transformer(), numeric_features),
-        ("cat", create_categorical_transformer(), categorical_features)
-    ])
+        preprocessor = ColumnTransformer(transformers=[
+            ("num", create_numeric_transformer(), numeric_features),
+            ("cat", create_categorical_transformer(), categorical_features)
+        ])
 
-    data_processed = pd.DataFrame(preprocessor.fit_transform(data))
-    data_processed.columns = numeric_features + list(preprocessor.named_transformers_["cat"].named_steps["onehot"].get_feature_names_out(categorical_features))
-    data_processed["hour_of_day"] = data["hour_of_day"].values
+        data_processed = pd.DataFrame(preprocessor.fit_transform(data))
+        data_processed.columns = numeric_features + list(preprocessor.named_transformers_["cat"].named_steps["onehot"].get_feature_names_out(categorical_features))
+        data_processed["hour_of_day"] = data["hour_of_day"].values
 
-    return data_processed
+        return data_processed
+    except KeyError as e:
+        logging.error(f"Error: A required column is missing. {e}")
+        return None
+    except Exception as e:
+        logging.error(f"An error occurred while preprocessing full channel data. {e}")
+        return None
 
 
 def preprocess_ticker_data(data):
@@ -92,29 +116,54 @@ def preprocess_ticker_data(data):
     Returns:
         pd.DataFrame: The preprocessed DataFrame ready for model consumption.
     """
-    data = add_time_features(data)
-    data.drop(columns=["type", "product_id", "low_24h"], inplace=True)
+    try:
+        data = add_time_features(data)
+        if data is None:
+            return None
+        data.drop(columns=["type", "product_id", "low_24h"], inplace=True)
 
-    numeric_cols = ["price", "open_24h", "volume_24h", "high_24h", "volume_30d", "best_bid", "best_ask", "last_size"]
-    data[numeric_cols] = MinMaxScaler().fit_transform(data[numeric_cols])
+        numeric_cols = ["price", "open_24h", "volume_24h", "high_24h", "volume_30d", "best_bid", "best_ask", "last_size"]
+        data[numeric_cols] = MinMaxScaler().fit_transform(data[numeric_cols])
 
-    data = pd.get_dummies(data, columns=["side"], drop_first=False)
-    return data
-
+        data = pd.get_dummies(data, columns=["side"], drop_first=False)
+        return data
+    except KeyError as e:
+        logging.error(f"Error: A required column is missing. {e}")
+        return None
+    except Exception as e:
+        logging.error(f"An error occurred while preprocessing ticker data. {e}")
+        return None
+    
 
 def preprocess_data():
     """ 
     Main function to load, process, and save the preprocessed full channel and ticker data.
     """
-    full_channel, ticker = load_data()
-    full_channel_processed = preprocess_full_channel_data(full_channel)
-    ticker_processed = preprocess_ticker_data(ticker)
+    try:
+        full_channel, ticker = load_data()
+    except Exception as e:
+        logging.error(f"An error occurred while loading data. {e}")
+        return
 
-    save_data(full_channel_processed, Config.PROCESSED_DATA_PATH + 'full_channel_processed.csv')
-    save_data(ticker_processed, Config.PROCESSED_DATA_PATH + 'ticker_processed.csv')
-    logging.info("Data preprocessing complete and files saved.")
+    full_channel_processed = preprocess_full_channel_data(full_channel)
+    if full_channel_processed is None:
+        logging.error("Full channel data preprocessing failed.")
+        return
+
+    ticker_processed = preprocess_ticker_data(ticker)
+    if ticker_processed is None:
+        logging.error("Ticker data preprocessing failed.")
+        return
+
+    try:
+        save_data(full_channel_processed, Config.PROCESSED_DATA_PATH + 'full_channel_processed.csv')
+        save_data(ticker_processed, Config.PROCESSED_DATA_PATH + 'ticker_processed.csv')
+        logging.info("Data preprocessing complete and files saved.")
+    except Exception as e:
+        logging.error(f"An error occurred while saving data. {e}")
 
 
 # Test
 if __name__ == "__main__":
     preprocess_data()
+    
