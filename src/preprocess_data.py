@@ -23,8 +23,8 @@ def add_time_features(data):
         pd.DataFrame: The DataFrame with an additional 'hour_of_day' feature.
     """
     try:
-        data["time"] = pd.to_datetime(data["time"])
-        data["hour_of_day"] = data["time"].dt.hour
+        data['time'] = pd.to_datetime(data['time'])
+        data['hour_of_day'] = data['time'].dt.hour
         return data
     except KeyError as e:
         logging.error(f"Error: The 'time' column is missing. {e}")
@@ -43,8 +43,8 @@ def create_numeric_transformer():
     """
     try:
         return Pipeline(steps=[
-            ("imputer", SimpleImputer(strategy="median")),
-            ("scaler", MinMaxScaler())
+            ('imputer', SimpleImputer(strategy='median')),
+            ('scaler', MinMaxScaler())
         ])
     except Exception as e:
         logging.error(f"An error occurred while creating the numeric transformer. {e}")
@@ -60,8 +60,8 @@ def create_categorical_transformer():
     """
     try:
         return Pipeline(steps=[
-            ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
-            ("onehot", OneHotEncoder(handle_unknown="ignore"))
+            ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+            ('onehot', OneHotEncoder(handle_unknown='ignore'))
         ])
     except Exception as e:
         logging.error(f"An error occurred while creating the categorical transformer. {e}")
@@ -82,20 +82,20 @@ def preprocess_full_channel_data(data):
         data = add_time_features(data)
         if data is None:
             return None
-        data.fillna({"remaining_size": 0, "price": data["price"].mean()}, inplace=True)
-        data["remaining_size_change"] = data.groupby("order_id")["remaining_size"].diff().fillna(0)
+        data.fillna({'remaining_size': 0, 'price': data['price'].mean()}, inplace=True)
+        data['remaining_size_change'] = data.groupby('order_id')['remaining_size'].diff().fillna(0)
 
         numeric_features = Config.NUMERIC_COLUMNS
         categorical_features = Config.CATEGORICAL_COLUMNS
 
         preprocessor = ColumnTransformer(transformers=[
-            ("num", create_numeric_transformer(), numeric_features),
-            ("cat", create_categorical_transformer(), categorical_features)
+            ('num', create_numeric_transformer(), numeric_features),
+            ('cat', create_categorical_transformer(), categorical_features)
         ])
 
         data_processed = pd.DataFrame(preprocessor.fit_transform(data))
-        data_processed.columns = numeric_features + list(preprocessor.named_transformers_["cat"].named_steps["onehot"].get_feature_names_out(categorical_features))
-        data_processed["hour_of_day"] = data["hour_of_day"].values
+        data_processed.columns = numeric_features + list(preprocessor.named_transformers_['cat'].named_steps['onehot'].get_feature_names_out(categorical_features))
+        data_processed['hour_of_day'] = data['hour_of_day'].values
 
         return data_processed
     except KeyError as e:
@@ -120,12 +120,12 @@ def preprocess_ticker_data(data):
         data = add_time_features(data)
         if data is None:
             return None
-        data.drop(columns=["type", "product_id", "low_24h"], inplace=True)
+        data.drop(columns=['type', 'product_id', 'low_24h'], inplace=True)
 
-        numeric_cols = ["price", "open_24h", "volume_24h", "high_24h", "volume_30d", "best_bid", "best_ask", "last_size"]
+        numeric_cols = ['price', 'open_24h', 'volume_24h', 'high_24h', 'volume_30d', 'best_bid', 'best_ask', 'last_size']
         data[numeric_cols] = MinMaxScaler().fit_transform(data[numeric_cols])
 
-        data = pd.get_dummies(data, columns=["side"], drop_first=False)
+        data = pd.get_dummies(data, columns=['side'], drop_first=False)
         return data
     except KeyError as e:
         logging.error(f"Error: A required column is missing. {e}")
@@ -166,4 +166,3 @@ def preprocess_data():
 # Test
 if __name__ == "__main__":
     preprocess_data()
-    

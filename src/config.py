@@ -25,6 +25,7 @@ class Config:
     SKIP_STEPS = 1  # Steps to skip for creating time-lagged features
     CATEGORICAL_COLUMNS = ['type', 'side', 'reason']
     NUMERIC_COLUMNS = ['price', 'size', 'remaining_size', 'remaining_size_change']
+    ROLLING_WINDOWS = [5, 10, 15]
 
     # Training configuration
     TRAIN_TEST_SPLIT_RATIO = 0.7
