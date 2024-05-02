@@ -41,16 +41,16 @@ def load_json_data(full_channel_files=None, ticker_files=None):
     """
     if full_channel_files is None:
         full_channel_files = [
-            Config.RAW_DATA_PATH + 'FullChannel_GDAX_20220511_17hr.json',
-            Config.RAW_DATA_PATH + 'FullChannel_GDAX_20220511_19hr.json',
-            Config.RAW_DATA_PATH + 'FullChannel_GDAX_20220511_20hr.json'
+            Config.FULL_CHANNEL_RAW_17HR_PATH,
+            Config.FULL_CHANNEL_RAW_19HR_PATH,
+            Config.FULL_CHANNEL_RAW_20HR_PATH
         ]
     
     if ticker_files is None:
         ticker_files = [
-            Config.RAW_DATA_PATH + 'Ticker_GDAX_20220511_17hr.json',
-            Config.RAW_DATA_PATH + 'Ticker_GDAX_20220511_19hr.json',
-            Config.RAW_DATA_PATH + 'Ticker_GDAX_20220511_20hr.json'
+            Config.TICKER_RAW_17HR_PATH,
+            Config.TICKER_RAW_19HR_PATH,
+            Config.TICKER_RAW_20HR_PATH
         ]
     full_channel_data = [load_json_file(file) for file in full_channel_files if os.path.exists(file)]
     ticker_data = [load_json_file(file) for file in ticker_files if os.path.exists(file)]
@@ -81,10 +81,10 @@ if __name__ == "__main__":
 
     # Load with specific files
     full_channel_specific_files = [
-        Config.RAW_DATA_PATH + 'FullChannel_GDAX_20220511_19hr.json'
+        Config.FULL_CHANNEL_RAW_19HR_PATH
     ]
     ticker_specific_files = [
-        Config.RAW_DATA_PATH + 'Ticker_GDAX_20220511_19hr.json'
+        Config.TICKER_RAW_19HR_PATH
     ]
     full_channel_specific, ticker_specific = load_json_data(full_channel_specific_files, ticker_specific_files)
     print(full_channel_specific.head())

@@ -38,6 +38,6 @@ def load_csv_data(full_channel_path, ticker_path):
 
 # Test
 if __name__ == "__main__":
-    full_channel, ticker = load_csv_data(Config.PROCESSED_DATA_PATH + 'full_channel_processed.csv', Config.PROCESSED_DATA_PATH + 'ticker_processed.csv')
+    full_channel, ticker = load_csv_data(Config.FULL_CHANNEL_PROCESSED_PATH, Config.TICKER_PROCESSED_PATH)
     print(full_channel.head())
     print(ticker.head())

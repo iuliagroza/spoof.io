@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 from torch import optim
-from torch.nn.utils import clip_grad_norm_
 from market_env import MarketEnvironment
 from ppo_policy_network import PPOPolicyNetwork, compute_returns, ppo_update
 from config import Config

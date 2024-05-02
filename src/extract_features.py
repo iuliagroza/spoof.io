@@ -150,7 +150,7 @@ def extract_features():
     """
     try:
         logging.info("Loading processed data...")
-        full_channel, ticker = load_csv_data(Config.PROCESSED_DATA_PATH + 'full_channel_processed.csv', Config.PROCESSED_DATA_PATH + 'ticker_processed.csv')
+        full_channel, ticker = load_csv_data(Config.FULL_CHANNEL_PROCESSED_PATH, Config.TICKER_PROCESSED_PATH)
     except Exception as e:
         logging.error(f"An error occurred while loading data. {e}")
         return
@@ -169,7 +169,7 @@ def extract_features():
 
     try:
         logging.info("Saving enhanced datasets...")
-        save_data(full_channel_enhanced, ticker_enhanced, Config.PROCESSED_DATA_PATH + 'full_channel_enhanced.csv', Config.PROCESSED_DATA_PATH + 'ticker_enhanced.csv')
+        save_data(full_channel_enhanced, ticker_enhanced, Config.FULL_CHANNEL_ENHANCED_PATH, Config.TICKER_ENHANCED_PATH)
 
         logging.info("Feature engineering complete and files saved.")
     except Exception as e:

@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 import logging
 from src.utils.load_csv_data import load_csv_data
@@ -23,21 +22,21 @@ class MarketEnvironment:
             train (bool): Flag to determine if the environment is for training or testing.
         """
         try:
-            full_channel, ticker = load_csv_data(Config.PROCESSED_DATA_PATH + 'full_channel_processed.csv', Config.PROCESSED_DATA_PATH + 'ticker_processed.csv')
+            full_channel, ticker = load_csv_data(Config.FULL_CHANNEL_ENHANCED_PATH, Config.TICKER_ENHANCED_PATH)
         except Exception as e:
             logging.error(f"Failed to load data with error: {e}")
             raise
 
         # Calculate split index for training
-        split_idx_full = int(len(full_channel) * Config.TRAIN_SPLIT)
-        split_idx_ticker = int(len(ticker) * Config.TRAIN_SPLIT)
+        split_idx_full = int(len(full_channel) * Config.TRAIN_TEST_SPLIT_RATIO)
+        split_idx_ticker = int(len(ticker) * Config.TRAIN_TEST_SPLIT_RATIO)
 
         self.full_channel_data = full_channel[:split_idx_full] if train else full_channel[split_idx_full:]
         self.ticker_data = ticker[:split_idx_ticker] if train else ticker[split_idx_ticker:]
         self.current_index = max(initial_index, history_t)
         self.history_t = history_t
         self.done = False
-        self.spoofing_threshold = Config.SPOOFING_THRESHOLD
+        self.spoofing_threshold = Config.DEFAULT_SPOOFING_THRESHOLD
 
     def reset(self):
         """
@@ -98,7 +97,7 @@ class MarketEnvironment:
         """
         full_row = self.full_channel_data.iloc[index]
         ticker_row = self.ticker_data.iloc[index]
-        weights = Config.ANOMALY_WEIGHTS
+        weights = Config.FEATURE_WEIGHTS
         scores = {
             'order_flow_imbalance': np.log1p(abs(full_row['order_flow_imbalance'])),
             'spread': np.log1p(abs(ticker_row['spread'])) if ticker_row['spread'] != 0 else 0,

@@ -158,7 +158,7 @@ def preprocess_data():
 
     try:
         logging.info("Saving preprocessed datasets...")
-        save_data(full_channel_processed, ticker_processed, Config.PROCESSED_DATA_PATH + 'full_channel_processed.csv', Config.PROCESSED_DATA_PATH + 'ticker_processed.csv')
+        save_data(full_channel_processed, ticker_processed, Config.FULL_CHANNEL_PROCESSED_PATH, Config.TICKER_PROCESSED_PATH)
 
         logging.info("Data preprocessing complete and files saved.")
     except Exception as e:
