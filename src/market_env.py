@@ -20,13 +20,12 @@ class MarketEnvironment:
     Represents a market environment for reinforcement learning, handling time-series data for financial trading simulations.
     """
 
-    def __init__(self, initial_index=0, history_t=10, train=True):
+    def __init__(self, initial_index=0, train=True):
         """
         Initializes the MarketEnvironment with data loaded from specified paths in the configuration.
 
         Args:
             initial_index (int): The starting index for data to simulate the environment's time step.
-            history_t (int): Number of past time steps to consider for generating a state.
             train (bool): Flag to determine if the environment is for training or testing, influencing data segmentation.
         """
         try:
@@ -41,8 +40,7 @@ class MarketEnvironment:
 
         self.full_channel_data = full_channel[:split_idx_full] if train else full_channel[split_idx_full:]
         self.ticker_data = ticker[:split_idx_ticker] if train else ticker[split_idx_ticker:]
-        self.current_index = max(initial_index, history_t)
-        self.history_t = history_t
+        self.current_index = max(initial_index, Config.HISTORY_WINDOW_SIZE)
         self.done = False
         self.spoofing_threshold = Config.DEFAULT_SPOOFING_THRESHOLD
 
@@ -53,7 +51,7 @@ class MarketEnvironment:
         Returns:
             np.array: The initial state from concatenated features of both datasets.
         """
-        self.current_index = self.history_t
+        self.current_index = Config.HISTORY_WINDOW_SIZE
         self.done = False
         return self.get_state()
 
@@ -94,8 +92,8 @@ class MarketEnvironment:
             np.array: Concatenated array of historical market features.
         """
         try:
-            full_features = self.full_channel_data.iloc[self.current_index - self.history_t:self.current_index].values.flatten()
-            ticker_features = self.ticker_data.iloc[self.current_index - self.history_t:self.current_index].values.flatten()
+            full_features = self.full_channel_data.iloc[self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index].values.flatten()
+            ticker_features = self.ticker_data.iloc[self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index].values.flatten()
             return np.concatenate([full_features, ticker_features])
         except Exception as e:
             logging.error(f"Failed to retrieve state at index {self.current_index}: {e}")
