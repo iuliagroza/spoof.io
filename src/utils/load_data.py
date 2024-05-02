@@ -11,7 +11,7 @@ def load_json(file_path):
     """
     Attempts to load JSON data from a specified file path.
 
-    Parameters:
+    Args:
         file_path (str): Path to the JSON file.
 
     Returns:
@@ -89,4 +89,3 @@ if __name__ == "__main__":
     full_channel_specific, ticker_specific = load_data(full_channel_specific_files, ticker_specific_files)
     print(full_channel_specific.head())
     print(ticker_specific.head())
-    

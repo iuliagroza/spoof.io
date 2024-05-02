@@ -7,14 +7,23 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class MarketEnvironment:
-    def __init__(self, full_channel_path=None, ticker_path=None, initial_index=0, history_t=10):
-        self.full_channel_data, self.ticker_data = self.load_data(full_channel_path, ticker_path)
+    def __init__(self, full_channel_path=None, ticker_path=None, initial_index=0, history_t=10, train=True):
+        full_channel, ticker = self.load_data(full_channel_path, ticker_path)
+        
+        # Calculate split index for training
+        split_idx_full = int(len(full_channel) * 0.7)
+        split_idx_ticker = int(len(ticker) * 0.7)
+
+        # Use only the first 70% of data if training, else use the remaining 30%
+        self.full_channel_data = full_channel[:split_idx_full] if train else full_channel[split_idx_full:]
+        self.ticker_data = ticker[:split_idx_ticker] if train else ticker[split_idx_ticker:]
+
         self.current_index = initial_index
         self.history_t = history_t
         self.done = False
 
-        # TODO: Hypertune
-        self.spoofing_threshold = 0.8  # Dynamically adjusted based on the model performance
+        # TODO: HYPERTUNE
+        self.spoofing_threshold = 0.8 
 
     def load_data(self, full_channel_path, ticker_path):
         full_channel = pd.read_csv(full_channel_path) if full_channel_path else pd.DataFrame()

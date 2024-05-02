@@ -28,9 +28,9 @@ def calculate_rolling_stats(data, column):
                 if op == 'mean':
                     data[target_column_name] = data[column].rolling(window=window, min_periods=1).mean()
                 elif op == 'std':
-                    data[target_column_name] = data[column].rolling(window=window, min_periods=1).std().fillna(method='bfill')
+                    data[target_column_name] = data[column].rolling(window=window, min_periods=1).std().bfill()
                 elif op == 'var':
-                    data[target_column_name] = data[column].rolling(window=window, min_periods=1).var().fillna(method='bfill')
+                    data[target_column_name] = data[column].rolling(window=window, min_periods=1).var().bfill()
             except Exception as e:
                 logging.error(f"Error calculating {op} for {target_column_name}: {e}")
     return data
@@ -144,19 +144,40 @@ def extract_ticker_features(data):
     return data
 
 
+def load_csv_data(file_path):
+    """
+    Load a CSV file into a DataFrame.
+
+    Args:
+        file_path (str): The complete path to the CSV file that needs to be loaded.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the data loaded from the CSV file.
+                      Returns an empty DataFrame if the file cannot be loaded due to
+                      any reason, such as the file not being found, being empty, or an error
+                      during the loading process.
+    """
+    try:
+        return pd.read_csv(file_path)
+    except FileNotFoundError:
+        logging.error(f"File not found: {file_path}")
+        return pd.DataFrame()
+    except pd.errors.EmptyDataError:
+        logging.error(f"No data in file: {file_path}")
+        return pd.DataFrame()
+    except Exception as e:
+        logging.error(f"Error loading file {file_path}: {e}")
+        return pd.DataFrame()
+
+
 def extract_features():
     """
     Main function to execute feature extraction for both full channel and ticker data.
     Uses configurations from Config and leverages functions from load_data and save_data.
     """
     logging.info("Loading processed data...")
-    full_channel_files = [
-        Config.PROCESSED_DATA_PATH + 'full_channel_processed.json'
-    ]
-    ticker_files = [
-        Config.PROCESSED_DATA_PATH + 'ticker_processed.json'
-    ]
-    full_channel, ticker = load_data(full_channel_files, ticker_files)
+    full_channel = load_csv_data(Config.PROCESSED_DATA_PATH + 'full_channel_processed.csv')
+    ticker = load_csv_data(Config.PROCESSED_DATA_PATH + 'ticker_processed.csv')
 
     logging.info("Extracting features for full channel data...")
     enhanced_full_channel = extract_full_channel_features(full_channel)
@@ -164,8 +185,8 @@ def extract_features():
     enhanced_ticker = extract_ticker_features(ticker)
 
     logging.info("Saving enhanced datasets...")
-    save_data(enhanced_full_channel, Config.PROCESSED_DATA_PATH + 'full_channel_enhanced.csv')
-    save_data(enhanced_ticker, Config.PROCESSED_DATA_PATH + 'ticker_enhanced.csv')
+    save_data(enhanced_full_channel, 'full_channel_enhanced.csv')
+    save_data(enhanced_ticker, 'ticker_enhanced.csv')
     logging.info("Feature extraction complete and files saved.")
 
 

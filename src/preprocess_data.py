@@ -16,7 +16,7 @@ def add_time_features(data):
     """ 
     Adds time-based features to a DataFrame by extracting hour of the day from the timestamp.
     
-    Parameters:
+    Args:
         data (pd.DataFrame): The DataFrame with a 'time' column in datetime format.
     
     Returns:
@@ -72,7 +72,7 @@ def preprocess_full_channel_data(data):
     """ 
     Processes the full channel data including adding time features, imputation, and encoding transformations.
     
-    Parameters:
+    Args:
         data (pd.DataFrame): The DataFrame to process.
     
     Returns:
@@ -110,7 +110,7 @@ def preprocess_ticker_data(data):
     """ 
     Processes the ticker data including adding time features, scaling, and one-hot encoding.
     
-    Parameters:
+    Args:
         data (pd.DataFrame): The DataFrame to process.
     
     Returns:
@@ -156,8 +156,8 @@ def preprocess_data():
         return
 
     try:
-        save_data(full_channel_processed, Config.PROCESSED_DATA_PATH + 'full_channel_processed.csv')
-        save_data(ticker_processed, Config.PROCESSED_DATA_PATH + 'ticker_processed.csv')
+        save_data(full_channel_processed, 'full_channel_processed.csv')
+        save_data(ticker_processed, 'ticker_processed.csv')
         logging.info("Data preprocessing complete and files saved.")
     except Exception as e:
         logging.error(f"An error occurred while saving data. {e}")

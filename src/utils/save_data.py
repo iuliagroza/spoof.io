@@ -11,7 +11,7 @@ def save_data(dataframe, filename, directory=Config.PROCESSED_DATA_PATH):
     """
     Saves the given DataFrame to a CSV file in the specified directory, ensuring the directory exists and the DataFrame is not empty.
     
-    Parameters:
+    Args:
         dataframe (pd.DataFrame): The data frame to save.
         filename (str): The name of the file (without path) where the data frame should be saved.
         directory (str): The directory to save the file. Default is Config.PROCESSED_DATA_PATH.
