@@ -1,11 +1,20 @@
 import pandas as pd
 import logging
 import os
+from config import Config
 
-# Basic logging setup
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=Config.LOG_LEVEL, format=Config.LOG_FORMAT)
 
 def load_json(file_path):
+    """
+    Attempts to load JSON data from a specified file path.
+
+    Parameters:
+        file_path (str): Path to the JSON file.
+
+    Returns:
+        DataFrame: Pandas DataFrame containing the loaded data, or an empty DataFrame if an error occurs.
+    """
     if not os.path.exists(file_path):
         logging.error(f"File not found: {file_path}")
         return pd.DataFrame()
@@ -16,7 +25,7 @@ def load_json(file_path):
         logging.error(f"Failed to load data from {file_path}: {e}")
         return pd.DataFrame()
     except Exception as e:
-        logging.error(f"An unexpected error occurred: {e}")
+        logging.error(f"An unexpected error occurred while loading {file_path}: {e}")
         return pd.DataFrame()
 
 def load_data():

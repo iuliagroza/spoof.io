@@ -7,28 +7,30 @@ import base64
 
 def get_auth_headers(api_key, secret_key, passphrase):
     timestamp = str(time.time())
-    message = timestamp + "GET" + "/users/self/verify"
+    message = timestamp + 'GET' + '/users/self/verify'
     hmac_key = base64.b64decode(secret_key)
     signature = hmac.new(hmac_key, message.encode(), hashlib.sha256)
     signature_b64 = base64.b64encode(signature.digest()).decode()
 
+    # INPUT CUSTOM RESPONSE INFO
     return {
-        "type": "subscribe",
-        "channels": [{"name": "full", "product_ids": ["ETH-USD"]}],
-        "signature": signature_b64,
-        "key": api_key,
-        "passphrase": passphrase,
-        "timestamp": timestamp
+        'type': 'subscribe',
+        'channels': [{'name': 'full', 'product_ids': ['ETH-USD']}],
+        'signature': signature_b64,
+        'key': api_key,
+        'passphrase': passphrase,
+        'timestamp': timestamp
     }
 
 def on_open(ws):
-    print("Open connection")
+    print("Open connection.")
 
+    # INPUT API DATA
     API_KEY = ""
     API_SECRET = ""
     API_PASSPHRASE = ""
 
-    # Subscribe to Level 3 order book data for ETH/USD
+    # Subscribe to Level 3 LOB data
     auth_headers = get_auth_headers(API_KEY, API_SECRET, API_PASSPHRASE)
     ws.send(json.dumps(auth_headers))
 
@@ -40,7 +42,7 @@ def on_error(ws, error):
     print(error)
 
 def on_close(ws, close_status_code, message):
-    print("Closed connection")
+    print("Closed connection.")
     print(message)
 
 def on_ping(ws, message):
