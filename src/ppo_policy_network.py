@@ -12,13 +12,16 @@ class PPOPolicyNetwork(nn.Module):
         self.fc1 = nn.Linear(num_features, 64)
         self.fc2 = nn.Linear(64, 64)
         self.fc3 = nn.Linear(64, num_actions)
-        self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, x):
         x = torch.relu(self.fc1(x))
         x = torch.relu(self.fc2(x))
-        action_probs = self.softmax(self.fc3(x))
-        return Categorical(action_probs)
+        action_logits = self.fc3(x)
+        action_probs = torch.softmax(action_logits, dim=-1)
+        if torch.any(torch.isnan(action_probs)) or torch.any(action_probs < 0) or torch.any(action_probs > 1):
+            print("Invalid probabilities detected")
+            action_probs = torch.clamp(action_probs, 0.0001, 0.9999)  # Clamp to avoid invalid values
+        return Categorical(probs=action_probs)
 
 def compute_returns(next_value, rewards, masks, gamma=0.99):
     R = next_value

@@ -45,7 +45,7 @@ def preprocess_full_channel_data(data):
 
     data_processed = pd.DataFrame(preprocessor.fit_transform(data))
     data_processed.columns = numeric_features + list(preprocessor.named_transformers_["cat"].named_steps["onehot"].get_feature_names_out(categorical_features))
-    data_processed["hour_of_day"] = data["hour_of_day"].values  # Reattach the hour_of_day column
+    data_processed["hour_of_day"] = data["hour_of_day"].values
 
     return data_processed
 

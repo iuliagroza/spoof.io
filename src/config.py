@@ -26,11 +26,26 @@ class Config:
     NUMERIC_COLUMNS = ['price', 'size', 'remaining_size', 'remaining_size_change']
 
     # Training configuration
-    TRAIN_TEST_SPLIT_RATIO = 0.8  # 80% training, 20% testing
+    TRAIN_TEST_SPLIT_RATIO = 0.7
     RANDOM_SEED = 42  # Seed for any random operations to ensure reproducibility
 
     # Deployment configurations
     API_VERSION = 'v1'
     API_TITLE = 'spoof.io - Spoofing and Layering Detection API'
-    API_DESCRIPTION = 'API for detecting spoofing and layering in trading data using PPO.'
+    API_DESCRIPTION = 'API for real-time detection of spoofing and layering in algorithmic trading using PPO.'
 
+    # Logging Configuration
+    LOG_LEVEL = 'INFO'
+    LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
+
+    # Model Checkpointing
+    CHECKPOINT_FREQ = 1000  # Frequency of checkpointing model weights
+    KEEP_LAST_N_CHECKPOINTS = 3  # Number of checkpoints to keep
+
+    # Hyperparameter Tuning
+    HYPERPARAMETERS = {
+        'learning_rate': [1e-4, 5e-4, 1e-3],
+        'batch_size': [32, 64, 128],
+        'n_epochs': [10, 20, 30],
+        'spoofing_threshold': [0.7, 0.8, 0.9]
+    }

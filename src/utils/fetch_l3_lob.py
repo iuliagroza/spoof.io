@@ -4,7 +4,6 @@ import time
 import hmac
 import hashlib
 import base64
-from datetime import datetime
 
 def get_auth_headers(api_key, secret_key, passphrase):
     timestamp = str(time.time())
