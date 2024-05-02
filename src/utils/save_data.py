@@ -4,39 +4,57 @@ import os
 from ..config import Config
 
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=Config.LOG_LEVEL, format=Config.LOG_FORMAT)
 
 
-def save_data(dataframe, filename, directory=Config.PROCESSED_DATA_PATH):
+def save_data(full_channel_df, ticker_df, full_channel_path, ticker_path):
     """
-    Saves the given DataFrame to a CSV file in the specified directory, ensuring the directory exists and the DataFrame is not empty.
-    
+    Saves the given DataFrames for full_channel and ticker to CSV files in the specified paths.
+
     Args:
-        dataframe (pd.DataFrame): The data frame to save.
-        filename (str): The name of the file (without path) where the data frame should be saved.
-        directory (str): The directory to save the file. Default is Config.PROCESSED_DATA_PATH.
+        full_channel_df (pd.DataFrame): DataFrame containing full channel data.
+        ticker_df (pd.DataFrame): DataFrame containing ticker data.
+        full_channel_path (str): Path to the full channel CSV file.
+        ticker_path (str): Path to the ticker CSV file.
     """
-    if dataframe.empty:
-        logging.warning(f"No data to save. The DataFrame is empty.")
+    # Save full channel DataFrame
+    if full_channel_df.empty:
+        logging.warning(f"No data to save. The full channel DataFrame is empty.")
         return
 
-    full_path = os.path.join(directory, filename)
-
-    # Ensure directory exists
-    os.makedirs(os.path.dirname(full_path), exist_ok=True)
+    os.makedirs(os.path.dirname(full_channel_path), exist_ok=True)
 
     try:
-        dataframe.to_csv(full_path, index=False)
-        logging.info(f"Data successfully saved to {full_path}")
+        full_channel_df.to_csv(full_channel_path, index=False)
+        logging.info(f"Full channel data successfully saved to {full_channel_path}")
     except pd.errors.EmptyDataError:
-        logging.error(f"No data to write to file: {full_path}")
+        logging.error(f"No data to write to file: {full_channel_path}")
     except IOError as e:
-        logging.error(f"IOError when trying to write file {full_path}: {e}")
+        logging.error(f"IOError when trying to write file {full_channel_path}: {e}")
     except Exception as e:
-        logging.error(f"An unexpected error occurred while saving data to {full_path}: {e}")
+        logging.error(f"An unexpected error occurred while saving data to {full_channel_path}: {e}")
+    
+    # Save ticker DataFrame
+    if ticker_df.empty:
+        logging.warning(f"No data to save. The ticker DataFrame is empty.")
+        return
 
+    os.makedirs(os.path.dirname(ticker_path), exist_ok=True)
+
+    try:
+        ticker_df.to_csv(ticker_path, index=False)
+        logging.info(f"Ticker data successfully saved to {ticker_path}")
+    except pd.errors.EmptyDataError:
+        logging.error(f"No data to write to file: {ticker_path}")
+    except IOError as e:
+        logging.error(f"IOError when trying to write file {ticker_path}: {e}")
+    except Exception as e:
+        logging.error(f"An unexpected error occurred while saving data to {ticker_path}: {e}")
+ 
 
 # Test
 if __name__ == "__main__":
-    df = pd.DataFrame({'column1': [1, 2, 3], 'column2': ['A', 'B', 'C']})
-    save_data(df, 'test_output_data.csv', Config.MISC_DATA_PATH)
+    full_channel_df = pd.DataFrame({'time': ['2021-01-01', '2021-01-02'], 'price': [100, 101], 'volume': [200, 210]})
+    ticker_df = pd.DataFrame({'time': ['2021-01-01', '2021-01-02'], 'last_price': [99, 98], 'last_volume': [190, 185]})
+
+    save_data(full_channel_df, ticker_df, Config.MISC_DATA_PATH + 'full_channel_output.csv', Config.MISC_DATA_PATH + 'ticker_output.csv')

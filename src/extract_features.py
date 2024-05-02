@@ -1,5 +1,5 @@
 import pandas as pd
-from src.utils.load_data import load_data
+from src.utils.load_csv_data import load_csv_data
 from src.utils.save_data import save_data
 from src.config import Config
 import logging
@@ -144,50 +144,36 @@ def extract_ticker_features(data):
     return data
 
 
-def load_csv_data(file_path):
-    """
-    Load a CSV file into a DataFrame.
-
-    Args:
-        file_path (str): The complete path to the CSV file that needs to be loaded.
-
-    Returns:
-        pd.DataFrame: A DataFrame containing the data loaded from the CSV file.
-                      Returns an empty DataFrame if the file cannot be loaded due to
-                      any reason, such as the file not being found, being empty, or an error
-                      during the loading process.
-    """
-    try:
-        return pd.read_csv(file_path)
-    except FileNotFoundError:
-        logging.error(f"File not found: {file_path}")
-        return pd.DataFrame()
-    except pd.errors.EmptyDataError:
-        logging.error(f"No data in file: {file_path}")
-        return pd.DataFrame()
-    except Exception as e:
-        logging.error(f"Error loading file {file_path}: {e}")
-        return pd.DataFrame()
-
-
 def extract_features():
     """
     Main function to execute feature extraction for both full channel and ticker data.
-    Uses configurations from Config and leverages functions from load_data and save_data.
     """
-    logging.info("Loading processed data...")
-    full_channel = load_csv_data(Config.PROCESSED_DATA_PATH + 'full_channel_processed.csv')
-    ticker = load_csv_data(Config.PROCESSED_DATA_PATH + 'ticker_processed.csv')
+    try:
+        logging.info("Loading processed data...")
+        full_channel, ticker = load_csv_data(Config.PROCESSED_DATA_PATH + 'full_channel_processed.csv', Config.PROCESSED_DATA_PATH + 'ticker_processed.csv')
+    except Exception as e:
+        logging.error(f"An error occurred while loading data. {e}")
+        return
 
     logging.info("Extracting features for full channel data...")
-    enhanced_full_channel = extract_full_channel_features(full_channel)
+    full_channel_enhanced = extract_full_channel_features(full_channel)
+    if full_channel_enhanced is None:
+        logging.error("Full channel feature engineering failed.")
+        return
+    
     logging.info("Extracting features for ticker data...")
-    enhanced_ticker = extract_ticker_features(ticker)
+    ticker_enhanced = extract_ticker_features(ticker)
+    if ticker_enhanced is None:
+        logging.error("Ticker feature engineering failed.")
+        return
 
-    logging.info("Saving enhanced datasets...")
-    save_data(enhanced_full_channel, 'full_channel_enhanced.csv')
-    save_data(enhanced_ticker, 'ticker_enhanced.csv')
-    logging.info("Feature extraction complete and files saved.")
+    try:
+        logging.info("Saving enhanced datasets...")
+        save_data(full_channel_enhanced, ticker_enhanced, Config.PROCESSED_DATA_PATH + 'full_channel_enhanced.csv', Config.PROCESSED_DATA_PATH + 'ticker_enhanced.csv')
+
+        logging.info("Feature engineering complete and files saved.")
+    except Exception as e:
+        logging.error(f"An error occurred while saving data. {e}")
 
 
 # Test

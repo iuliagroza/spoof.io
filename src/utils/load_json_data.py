@@ -7,7 +7,7 @@ from ..config import Config
 logging.basicConfig(level=Config.LOG_LEVEL, format=Config.LOG_FORMAT)
 
 
-def load_json(file_path):
+def load_json_file(file_path):
     """
     Attempts to load JSON data from a specified file path.
 
@@ -31,7 +31,7 @@ def load_json(file_path):
         return pd.DataFrame()
 
 
-def load_data(full_channel_files=None, ticker_files=None):
+def load_json_data(full_channel_files=None, ticker_files=None):
     """
     Loads data into pandas DataFrames from JSON files specified in environment variables or defaults.
     
@@ -52,8 +52,8 @@ def load_data(full_channel_files=None, ticker_files=None):
             Config.RAW_DATA_PATH + 'Ticker_GDAX_20220511_19hr.json',
             Config.RAW_DATA_PATH + 'Ticker_GDAX_20220511_20hr.json'
         ]
-    full_channel_data = [load_json(file) for file in full_channel_files if os.path.exists(file)]
-    ticker_data = [load_json(file) for file in ticker_files if os.path.exists(file)]
+    full_channel_data = [load_json_file(file) for file in full_channel_files if os.path.exists(file)]
+    ticker_data = [load_json_file(file) for file in ticker_files if os.path.exists(file)]
 
     # Concatenate data
     combined_full_channel = pd.concat(full_channel_data, ignore_index=True) if full_channel_data else pd.DataFrame()
@@ -75,7 +75,7 @@ def load_data(full_channel_files=None, ticker_files=None):
 # Test
 if __name__ == "__main__":
     # Default load
-    full_channel, ticker = load_data()
+    full_channel, ticker = load_json_data()
     print(full_channel.head())
     print(ticker.head())
 
@@ -86,6 +86,6 @@ if __name__ == "__main__":
     ticker_specific_files = [
         Config.RAW_DATA_PATH + 'Ticker_GDAX_20220511_19hr.json'
     ]
-    full_channel_specific, ticker_specific = load_data(full_channel_specific_files, ticker_specific_files)
+    full_channel_specific, ticker_specific = load_json_data(full_channel_specific_files, ticker_specific_files)
     print(full_channel_specific.head())
     print(ticker_specific.head())

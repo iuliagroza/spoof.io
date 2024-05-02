@@ -3,7 +3,7 @@ from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
-from src.utils.load_data import load_data
+from src.utils.load_json_data import load_json_data
 from src.utils.save_data import save_data
 from src.config import Config
 import logging
@@ -140,7 +140,8 @@ def preprocess_data():
     Main function to load, process, and save the preprocessed full channel and ticker data.
     """
     try:
-        full_channel, ticker = load_data()
+        logging.info("Loading raw data...")
+        full_channel, ticker = load_json_data()
     except Exception as e:
         logging.error(f"An error occurred while loading data. {e}")
         return
@@ -156,8 +157,9 @@ def preprocess_data():
         return
 
     try:
-        save_data(full_channel_processed, 'full_channel_processed.csv')
-        save_data(ticker_processed, 'ticker_processed.csv')
+        logging.info("Saving preprocessed datasets...")
+        save_data(full_channel_processed, ticker_processed, Config.PROCESSED_DATA_PATH + 'full_channel_processed.csv', Config.PROCESSED_DATA_PATH + 'ticker_processed.csv')
+
         logging.info("Data preprocessing complete and files saved.")
     except Exception as e:
         logging.error(f"An error occurred while saving data. {e}")
