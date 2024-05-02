@@ -3,9 +3,9 @@ from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
-from utils.load_data import load_data
-from utils.save_data import save_data
-from config import Config
+from src.utils.load_data import load_data
+from src.utils.save_data import save_data
+from src.config import Config
 import logging
 
 
@@ -106,7 +106,7 @@ def preprocess_data():
     """ 
     Main function to load, process, and save the preprocessed full channel and ticker data.
     """
-    full_channel, ticker = load_data(Config.RAW_DATA_PATH)
+    full_channel, ticker = load_data()
     full_channel_processed = preprocess_full_channel_data(full_channel)
     ticker_processed = preprocess_ticker_data(ticker)
 
