@@ -1,9 +1,11 @@
 import pandas as pd
 import logging
 import os
-from config import Config
+from ..config import Config
+
 
 logging.basicConfig(level=Config.LOG_LEVEL, format=Config.LOG_FORMAT)
+
 
 def load_json(file_path):
     """
@@ -28,7 +30,8 @@ def load_json(file_path):
         logging.error(f"An unexpected error occurred while loading {file_path}: {e}")
         return pd.DataFrame()
 
-def load_data():
+
+def load_data(full_channel_files=None, ticker_files=None):
     """
     Loads data into pandas DataFrames from JSON files specified in environment variables or defaults.
     
@@ -36,10 +39,19 @@ def load_data():
         combined_full_channel (pd.DataFrame): Concatenated DataFrame for FullChannel data.
         combined_ticker (pd.DataFrame): Concatenated DataFrame for Ticker data.
     """
-    # Environment variables for file paths or default paths
-    full_channel_files = os.getenv("FULL_CHANNEL_FILES", "../data/raw/FullChannel_GDAX_20220511_17hr.json,../data/raw/FullChannel_GDAX_20220511_19hr.json,../data/raw/FullChannel_GDAX_20220511_20hr.json").split(",")
-    ticker_files = os.getenv("TICKER_FILES", "../data/raw/Ticker_GDAX_20220511_17hr.json,../data/raw/Ticker_GDAX_20220511_19hr.json,../data/raw/Ticker_GDAX_20220511_20hr.json").split(",")
-
+    if full_channel_files is None:
+        full_channel_files = [
+            Config.RAW_DATA_PATH + 'FullChannel_GDAX_20220511_17hr.json',
+            Config.RAW_DATA_PATH + 'FullChannel_GDAX_20220511_19hr.json',
+            Config.RAW_DATA_PATH + 'FullChannel_GDAX_20220511_20hr.json'
+        ]
+    
+    if ticker_files is None:
+        ticker_files = [
+            Config.RAW_DATA_PATH + 'Ticker_GDAX_20220511_17hr.json',
+            Config.RAW_DATA_PATH + 'Ticker_GDAX_20220511_19hr.json',
+            Config.RAW_DATA_PATH + 'Ticker_GDAX_20220511_20hr.json'
+        ]
     full_channel_data = [load_json(file) for file in full_channel_files if os.path.exists(file)]
     ticker_data = [load_json(file) for file in ticker_files if os.path.exists(file)]
 
@@ -59,8 +71,21 @@ def load_data():
 
     return combined_full_channel, combined_ticker
 
+
 # Test
 if __name__ == "__main__":
+    # Default load
     full_channel, ticker = load_data()
     print(full_channel.head())
     print(ticker.head())
+
+    # Load with specific files
+    full_channel_specific_files = [
+        Config.RAW_DATA_PATH + 'FullChannel_GDAX_20220511_19hr.json'
+    ]
+    ticker_specific_files = [
+        Config.RAW_DATA_PATH + 'Ticker_GDAX_20220511_19hr.json'
+    ]
+    full_channel_specific, ticker_specific = load_data(full_channel_specific_files, ticker_specific_files)
+    print(full_channel_specific.head())
+    print(ticker_specific.head())

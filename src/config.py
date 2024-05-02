@@ -1,9 +1,9 @@
 class Config:
-    RAW_DATA_PATH = '../data/raw/'
-    PROCESSED_DATA_PATH = '../data/processed/'
-    MODEL_SAVE_PATH = '../models/'
-    REPORT_PATH = '../reports/'
-    OUTPUT_PATH = '../outputs/'
+    RAW_DATA_PATH = 'data/raw/'
+    PROCESSED_DATA_PATH = 'data/processed/'
+    MODEL_SAVE_PATH = 'models/'
+    REPORT_PATH = 'reports/'
+    OUTPUT_PATH = 'outputs/'
 
     # PPO Model Parameters
     PPO_CONFIG = {

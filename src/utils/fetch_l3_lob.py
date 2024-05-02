@@ -5,6 +5,7 @@ import hmac
 import hashlib
 import base64
 
+
 def get_auth_headers(api_key, secret_key, passphrase):
     timestamp = str(time.time())
     message = timestamp + 'GET' + '/users/self/verify'
@@ -22,13 +23,14 @@ def get_auth_headers(api_key, secret_key, passphrase):
         'timestamp': timestamp
     }
 
+
 def on_open(ws):
     print("Open connection.")
 
     # INPUT API DATA
-    API_KEY = ""
-    API_SECRET = ""
-    API_PASSPHRASE = ""
+    API_KEY = ''
+    API_SECRET = ''
+    API_PASSPHRASE = ''
 
     # Subscribe to Level 3 LOB data
     auth_headers = get_auth_headers(API_KEY, API_SECRET, API_PASSPHRASE)
@@ -47,14 +49,14 @@ def on_close(ws, close_status_code, message):
 
 def on_ping(ws, message):
     print("Received PING! Sending PONG!")
-    ws.send(json.dumps({"type": "pong"}))
+    ws.send(json.dumps({'type': 'pong'}))
 
 def on_pong(ws, message):
     print("Received PONG!")
 
 if __name__ == "__main__":
     # Coinbase Pro WebSocket URL
-    socket = "wss://ws-feed.pro.coinbase.com"
+    socket = 'wss://ws-feed.pro.coinbase.com'
 
     # Create a WebSocket object
     ws = websocket.WebSocketApp(socket,
