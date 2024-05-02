@@ -8,7 +8,7 @@ import logging
 logging.basicConfig(level=Config.LOG_LEVEL, format=Config.LOG_FORMAT)
 
 
-def calculate_rolling_stats(data, column, windows, operations):
+def calculate_rolling_stats(data, column):
     """
     Calculate rolling statistics for specified windows and operations on a given column.
     
@@ -21,8 +21,8 @@ def calculate_rolling_stats(data, column, windows, operations):
     Returns:
         data (pd.DataFrame): The dataset with new columns for each calculated statistic.
     """
-    for window in windows:
-        for op in operations:
+    for window in Config.ROLLING_WINDOWS:
+        for op in Config.OPERATIONS:
             target_column_name = f"{column}_{window}_{op}"
             try:
                 if op == 'mean':
@@ -119,8 +119,8 @@ def extract_full_channel_features(data):
         data (pd.DataFrame): The full channel data with new features added.
     """
     logging.info("Extracting full channel features...")
-    data = calculate_rolling_stats(data, 'price', Config.ROLLING_WINDOWS, ['mean', 'std'])
-    data = calculate_rolling_stats(data, 'size', Config.ROLLING_WINDOWS, ['mean', 'std'])
+    data = calculate_rolling_stats(data, 'price')
+    data = calculate_rolling_stats(data, 'size')
     data = calculate_order_flow_imbalance(data)
     data = add_cancellation_ratio(data)
     data = encode_hour_of_day(data)
@@ -139,7 +139,7 @@ def extract_ticker_features(data):
     """
     logging.info("Extracting ticker features...")
     data = market_spread(data)
-    data = calculate_rolling_stats(data, 'last_size', Config.ROLLING_WINDOWS, ['mean', 'var'])
+    data = calculate_rolling_stats(data, 'last_size')
     data = encode_hour_of_day(data)
     return data
 

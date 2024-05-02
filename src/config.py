@@ -3,8 +3,6 @@ class Config:
     PROCESSED_DATA_PATH = 'data/processed/'
     MISC_DATA_PATH = 'data/misc/'
     MODEL_SAVE_PATH = 'models/'
-    REPORT_PATH = 'reports/'
-    OUTPUT_PATH = 'outputs/'
 
     # PPO Model Parameters
     PPO_CONFIG = {
@@ -21,11 +19,10 @@ class Config:
     }
 
     # Data preprocessing and feature extraction parameters
-    FEATURE_WINDOW = 5  # Window size for creating rolling features
-    SKIP_STEPS = 1  # Steps to skip for creating time-lagged features
     CATEGORICAL_COLUMNS = ['type', 'side', 'reason']
     NUMERIC_COLUMNS = ['price', 'size', 'remaining_size', 'remaining_size_change']
     ROLLING_WINDOWS = [5, 10, 15]
+    OPERATIONS = ['mean', 'std', 'var']
 
     # Training configuration
     TRAIN_TEST_SPLIT_RATIO = 0.7
