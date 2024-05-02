@@ -42,4 +42,4 @@ def save_data(dataframe, filename, directory=Config.PROCESSED_DATA_PATH):
 # Test
 if __name__ == "__main__":
     df = pd.DataFrame({'column1': [1, 2, 3], 'column2': ['A', 'B', 'C']})
-    save_data(df, 'test_output_data.csv', 'data/misc/')
+    save_data(df, 'test_output_data.csv', Config.MISC_DATA_PATH)
