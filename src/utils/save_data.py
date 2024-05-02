@@ -9,16 +9,12 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 
 def save_data(dataframe, filename, directory=Config.PROCESSED_DATA_PATH):
     """
-    Saves the given DataFrame to a CSV file in the specified directory,
-    ensuring the directory exists and the DataFrame is not empty.
+    Saves the given DataFrame to a CSV file in the specified directory, ensuring the directory exists and the DataFrame is not empty.
     
     Parameters:
         dataframe (pd.DataFrame): The data frame to save.
         filename (str): The name of the file (without path) where the data frame should be saved.
         directory (str): The directory to save the file. Default is Config.PROCESSED_DATA_PATH.
-        
-    Returns:
-        None
     """
     if dataframe.empty:
         logging.warning(f"No data to save. The DataFrame is empty.")
@@ -38,6 +34,7 @@ def save_data(dataframe, filename, directory=Config.PROCESSED_DATA_PATH):
         logging.error(f"IOError when trying to write file {full_path}: {e}")
     except Exception as e:
         logging.error(f"An unexpected error occurred while saving data to {full_path}: {e}")
+
 
 # Test
 if __name__ == "__main__":

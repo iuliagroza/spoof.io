@@ -14,7 +14,13 @@ logging.basicConfig(level=Config.LOG_LEVEL, format=Config.LOG_FORMAT)
 
 def add_time_features(data):
     """ 
-    Adds time-based features to a DataFrame.
+    Adds time-based features to a DataFrame by extracting hour of the day from the timestamp.
+    
+    Parameters:
+        data (pd.DataFrame): The DataFrame with a 'time' column in datetime format.
+    
+    Returns:
+        pd.DataFrame: The DataFrame with an additional 'hour_of_day' feature.
     """
     data["time"] = pd.to_datetime(data["time"])
     data["hour_of_day"] = data["time"].dt.hour
@@ -23,7 +29,10 @@ def add_time_features(data):
 
 def create_numeric_transformer():
     """ 
-    Returns a pipeline for numeric transformations. 
+    Creates a pipeline for processing numeric features. This includes imputation of missing values with the median and scaling features between 0 and 1.
+    
+    Returns:
+        Pipeline: A configured pipeline for numeric feature transformations.
     """
     return Pipeline(steps=[
         ("imputer", SimpleImputer(strategy="median")),
@@ -33,7 +42,10 @@ def create_numeric_transformer():
 
 def create_categorical_transformer():
     """ 
-    Returns a pipeline for categorical transformations.
+    Creates a pipeline for processing categorical features. This includes imputation of missing values with a placeholder and encoding of categorical features as one-hot vectors.
+    
+    Returns:
+        Pipeline: A configured pipeline for categorical feature transformations.
     """
     return Pipeline(steps=[
         ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
@@ -42,6 +54,15 @@ def create_categorical_transformer():
 
 
 def preprocess_full_channel_data(data):
+    """ 
+    Processes the full channel data including adding time features, imputation, and encoding transformations.
+    
+    Parameters:
+        data (pd.DataFrame): The DataFrame to process.
+    
+    Returns:
+        pd.DataFrame: The preprocessed DataFrame ready for model consumption.
+    """
     data = add_time_features(data)
     data.fillna({"remaining_size": 0, "price": data["price"].mean()}, inplace=True)
     data["remaining_size_change"] = data.groupby("order_id")["remaining_size"].diff().fillna(0)
@@ -62,6 +83,15 @@ def preprocess_full_channel_data(data):
 
 
 def preprocess_ticker_data(data):
+    """ 
+    Processes the ticker data including adding time features, scaling, and one-hot encoding.
+    
+    Parameters:
+        data (pd.DataFrame): The DataFrame to process.
+    
+    Returns:
+        pd.DataFrame: The preprocessed DataFrame ready for model consumption.
+    """
     data = add_time_features(data)
     data.drop(columns=["type", "product_id", "low_24h"], inplace=True)
 
@@ -73,6 +103,9 @@ def preprocess_ticker_data(data):
 
 
 def preprocess_data():
+    """ 
+    Main function to load, process, and save the preprocessed full channel and ticker data.
+    """
     full_channel, ticker = load_data(Config.RAW_DATA_PATH)
     full_channel_processed = preprocess_full_channel_data(full_channel)
     ticker_processed = preprocess_ticker_data(ticker)
@@ -85,4 +118,3 @@ def preprocess_data():
 # Test
 if __name__ == "__main__":
     preprocess_data()
-    
