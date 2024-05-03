@@ -3,7 +3,7 @@ from src.utils.log_config import setup_logger
 from src.config import Config
 
 
-logger = setup_logger()
+logger = setup_logger(__name__)
 
 
 def load_csv_data(full_channel_path, ticker_path):

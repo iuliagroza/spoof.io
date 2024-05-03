@@ -9,7 +9,7 @@ from src.utils.save_data import save_data
 from src.config import Config
 
 
-logger = setup_logger()
+logger = setup_logger(__name__)
 
 
 def add_time_features(data):

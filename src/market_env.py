@@ -5,7 +5,7 @@ from src.config import Config
 
 
 # Set up logging to save environment logs for debugging purposes
-logger = setup_logger(Config.LOG_MARKET_ENV_PATH)
+logger = setup_logger(__name__, Config.LOG_MARKET_ENV_PATH)
 
 
 class MarketEnvironment:

@@ -8,7 +8,7 @@ from src.market_env import MarketEnvironment
 
 
 # Set up logging to save environment logs for debugging purposes
-logger = setup_logger(Config.LOG_PPO_POLICY_NETWORK_PATH)
+logger = setup_logger(__name__, Config.LOG_PPO_POLICY_NETWORK_PATH)
 
 
 class PPOPolicyNetwork(nn.Module):
@@ -115,7 +115,7 @@ def ppo_update(network, optimizer, states, actions, old_log_probs, advantages, r
         surr1 = ratios * advantages
         surr2 = torch.clamp(ratios, 1 - clip_param, 1 + clip_param) * advantages
         actor_loss = -torch.min(surr1, surr2).mean()
-        critic_loss = 0.5 * (returns - dist.mean).pow(2).mean()
+        critic_loss = 0.5 * (returns - dist.probs.mean()).pow(2).mean()  # ensure probs are never zero
         loss = actor_loss + critic_loss - Config.PPO_CONFIG['ent_coef'] * entropy
 
         optimizer.zero_grad()
@@ -125,13 +125,14 @@ def ppo_update(network, optimizer, states, actions, old_log_probs, advantages, r
 
         return loss.item()
     except Exception as e:
-        logger.error(f"Failed during PPO update: {str(e)}")
-        raise
+        logger.error(f"Failed during PPO update: {e}")
+        raise Exception(f"PPO update failed: {e}")
 
 
 # Test
 if __name__ == "__main__":
     try:
+        # Enviornment and network setup
         env = MarketEnvironment()
         num_features = len(env.reset())
         num_actions = 2  # Binary actions: 0 (no spoofing), 1 (spoofing)
