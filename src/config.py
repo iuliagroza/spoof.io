@@ -27,10 +27,14 @@ class Config:
     TICKER_PROCESSED_PATH = PROCESSED_DATA_PATH + 'ticker_processed.csv'
     TICKER_ENHANCED_PATH = PROCESSED_DATA_PATH + 'ticker_enhanced.csv'
 
+    # Model paths
+    PPO_POLICY_NETWORK_MODEL_PATH = MODEL_SAVE_PATH + 'ppo_model.pth'
+
     # Logging Configuration
     LOG_LEVEL = 'INFO'
     LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
     LOG_MARKET_ENV_PATH = OUTPUT_PATH + 'market_env.log'
+    LOG_PPO_POLICY_NETWORK_PATH = OUTPUT_PATH + 'ppo_policy_network.log'
 
     # Data preprocessing parameters
     CATEGORICAL_COLUMNS = ['type', 'side', 'reason']

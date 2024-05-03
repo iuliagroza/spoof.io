@@ -92,9 +92,9 @@ class MarketEnvironment:
             np.array: Concatenated array of historical market features.
         """
         try:
-            full_features = self.full_channel_data.iloc[self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index].values.flatten()
+            full_channel_features = self.full_channel_data.iloc[self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index].values.flatten()
             ticker_features = self.ticker_data.iloc[self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index].values.flatten()
-            return np.concatenate([full_features, ticker_features])
+            return np.concatenate([full_channel_features, ticker_features])
         except Exception as e:
             logging.error(f"Failed to retrieve state at index {self.current_index}: {e}")
             raise

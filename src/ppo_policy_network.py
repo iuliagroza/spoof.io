@@ -5,25 +5,60 @@ import torch.optim as optim
 import numpy as np
 from market_env import MarketEnvironment
 from config import Config
+import logging
+
+
+# Set up logging to save environment logs for debugging purposes
+logging.basicConfig(
+    level=Config.LOG_LEVEL,
+    format=Config.LOG_FORMAT,
+    handlers=[
+        logging.FileHandler(Config.LOG_PPO_POLICY_NETWORK_PATH, mode='w'),  # Log file overwritten at each run
+        logging.StreamHandler()
+    ]
+)
 
 class PPOPolicyNetwork(nn.Module):
+    """ 
+    Policy Network for the Proximal Policy Optimization algorithm. 
+    """
+
     def __init__(self, num_features, num_actions):
+        """
+        Initializes the network with three fully connected layers.
+
+        Args:
+            num_features (int): Number of input features.
+            num_actions (int): Number of possible actions.
+        """
         super(PPOPolicyNetwork, self).__init__()
         self.fc1 = nn.Linear(num_features, 64)
         self.fc2 = nn.Linear(64, 64)
         self.fc3 = nn.Linear(64, num_actions)
 
     def forward(self, x):
+        """ 
+        Performs the forward pass in the network. 
+        """
         x = torch.relu(self.fc1(x))
         x = torch.relu(self.fc2(x))
         action_logits = self.fc3(x)
         action_probs = torch.softmax(action_logits, dim=-1)
-        if torch.any(torch.isnan(action_probs)) or torch.any(action_probs < 0) or torch.any(action_probs > 1):
-            print("Invalid probabilities detected")
-            action_probs = torch.clamp(action_probs, 0.0001, 0.9999)  # Clamp to avoid invalid values
         return Categorical(probs=action_probs)
 
-def compute_returns(next_value, rewards, masks, gamma=0.99):
+def compute_returns(next_value, rewards, masks, gamma=Config.PPO_CONFIG['gamma']):
+    """
+    Compute the returns for each time step, using the rewards and the discount factor.
+
+    Args:
+        next_value (float): The estimated value of the subsequent state.
+        rewards (list): List of rewards obtained.
+        masks (list): List of masks indicating whether the episode is continuing.
+        gamma (float): Discount factor.
+    
+    Returns:
+        list: The list of computed returns.
+    """
     R = next_value
     returns = []
     for step in reversed(range(len(rewards))):
@@ -31,13 +66,35 @@ def compute_returns(next_value, rewards, masks, gamma=0.99):
         returns.insert(0, R)
     return returns
 
-def ppo_iter(mini_batch_size, states, actions, log_probs, returns, advantage):
+def ppo_iter(mini_batch_size, states, actions, log_probs, returns, advantages):
+    """
+    Generator for mini-batches of training data.
+
+    Args:
+        mini_batch_size (int): Size of the mini-batch.
+        states (torch.Tensor): State inputs.
+        actions (torch.Tensor): Action outputs.
+        log_probs (torch.Tensor): Logarithms of the probabilities of actions taken.
+        returns (torch.Tensor): Returns computed from rewards.
+        advantages (torch.Tensor): Advantage estimates.
+    """
     batch_size = states.size(0)
     for _ in range(batch_size // mini_batch_size):
         rand_ids = np.random.randint(0, batch_size, mini_batch_size)
-        yield states[rand_ids, :], actions[rand_ids, :], log_probs[rand_ids, :], returns[rand_ids, :], advantage[rand_ids, :]
+        yield states[rand_ids, :], actions[rand_ids, :], log_probs[rand_ids, :], returns[rand_ids, :], advantages[rand_ids, :]
 
-def ppo_update(policy_net, optimizer, ppo_epochs, mini_batch_size, states, actions, log_probs, returns, advantages, clip_param=0.2):
+def ppo_update(policy_net, optimizer, ppo_epochs, mini_batch_size, states, actions, log_probs, returns, advantages, clip_param=Config.PPO_CONFIG['clip_range']):
+    """
+    Update the policy network using the PPO algorithm.
+
+    Args:
+        policy_net (PPOPolicyNetwork): The policy network to update.
+        optimizer (torch.optim.Optimizer): Optimizer.
+        ppo_epochs (int): Number of epochs to update over.
+        mini_batch_size (int): Size of each mini-batch.
+        states, actions, log_probs, returns, advantages: Training data tensors.
+        clip_param (float): Clipping parameter for PPO.
+    """
     for _ in range(ppo_epochs):
         for state, action, old_log_probs, return_, advantage in ppo_iter(mini_batch_size, states, actions, log_probs, returns, advantages):
             dist = policy_net(state)
@@ -53,17 +110,11 @@ def ppo_update(policy_net, optimizer, ppo_epochs, mini_batch_size, states, actio
             loss.mean().backward()
             optimizer.step()
 
-def safe_float_convert(data):
-    try:
-        return np.float32(data)
-    except:
-        return 0.0
-
+# Test
 if __name__ == "__main__":
-    env = MarketEnvironment(Config.PROCESSED_DATA_PATH + "full_channel_enhanced.csv",
-                            Config.PROCESSED_DATA_PATH + "ticker_enhanced.csv")
+    env = MarketEnvironment(Config.FULL_CHANNEL_ENHANCED_PATH, Config.TICKER_ENHANCED_PATH)
     num_features = len(env.reset())
-    num_actions = 3 
+    num_actions = 2
 
     policy_net = PPOPolicyNetwork(num_features, num_actions)
     optimizer = optim.Adam(policy_net.parameters(), lr=Config.PPO_CONFIG['learning_rate'])
@@ -71,16 +122,16 @@ if __name__ == "__main__":
     # Training loop
     state = env.reset()
     while not env.done:
-        state = np.array([safe_float_convert(x) for x in state], dtype=np.float32)
+        state = np.array([np.float32(x) for x in state], dtype=np.float32)
         state_tensor = torch.FloatTensor(state).unsqueeze(0)
 
         dist = policy_net(state_tensor)
-        action = dist.sample() 
+        action = dist.sample()
         next_state, reward, done = env.step(action.item())
-
-        print(f"Reward: {reward}, New State: {next_state if next_state is not None else 'End of Data'}")
+        logging.info(f"Reward: {reward}")
+        logging.debug(f"New State: {next_state if next_state is not None else 'End of Data'}")
         if not done:
             state = next_state
 
-    torch.save(policy_net.state_dict(), Config.MODEL_SAVE_PATH + 'final_policy_network.pth')
-    print("Training complete, model saved.")
+    torch.save(policy_net.state_dict(), Config.PPO_POLICY_NETWORK_MODEL_PATH)
+    logging.info("Training complete, model saved.")
