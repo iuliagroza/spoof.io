@@ -29,20 +29,29 @@ class MarketEnvironment:
             train (bool): Flag to determine if the environment is for training or testing, influencing data segmentation.
         """
         try:
-            full_channel, ticker = load_csv_data(Config.FULL_CHANNEL_ENHANCED_PATH, Config.TICKER_ENHANCED_PATH)
+            self.full_channel_data, self.ticker_data = load_csv_data(Config.FULL_CHANNEL_ENHANCED_PATH, Config.TICKER_ENHANCED_PATH)
+            self.split_data(train)
         except Exception as e:
             logging.error(f"Failed to load data with error: {e}")
             raise
 
-        # Calculate split index for training
-        split_idx_full = int(len(full_channel) * Config.TRAIN_TEST_SPLIT_RATIO)
-        split_idx_ticker = int(len(ticker) * Config.TRAIN_TEST_SPLIT_RATIO)
-
-        self.full_channel_data = full_channel[:split_idx_full] if train else full_channel[split_idx_full:]
-        self.ticker_data = ticker[:split_idx_ticker] if train else ticker[split_idx_ticker:]
         self.current_index = max(initial_index, Config.HISTORY_WINDOW_SIZE)
         self.done = False
-        self.spoofing_threshold = Config.DEFAULT_SPOOFING_THRESHOLD
+        self.spoofing_threshold = Config.DEFAULT_SPOOFING_THRESHOLD  # Initialize dynamic thresholding
+        self.update_threshold()
+
+    def split_data(self, train):
+        """ 
+        Splits the data into training or testing segments based on the configuration ratio.
+        """
+        split_idx_full = int(len(self.full_channel_data) * Config.TRAIN_TEST_SPLIT_RATIO)
+        split_idx_ticker = int(len(self.ticker_data) * Config.TRAIN_TEST_SPLIT_RATIO)
+        if train:
+            self.full_channel_data = self.full_channel_data[:split_idx_full]
+            self.ticker_data = self.ticker_data[:split_idx_ticker]
+        else:
+            self.full_channel_data = self.full_channel_data[split_idx_full:]
+            self.ticker_data = self.ticker_data[split_idx_ticker:]
 
     def reset(self):
         """
@@ -53,6 +62,7 @@ class MarketEnvironment:
         """
         self.current_index = Config.HISTORY_WINDOW_SIZE
         self.done = False
+        self.update_threshold()  # Update threshold each episode based on recent trends
         return self.get_state()
 
     def step(self, action):
@@ -65,6 +75,7 @@ class MarketEnvironment:
         Returns:
             tuple: A tuple containing the next state (np.array or None), the reward (int), and the done flag (bool).
         """
+        # Terminal state reached: neutral outcome (reward "zero")
         if self.current_index >= len(self.full_channel_data) or self.current_index >= len(self.ticker_data):
             self.done = True
             return None, 0, True
@@ -75,9 +86,6 @@ class MarketEnvironment:
             reward = 1 if (action == 1 and is_spoofing) or (action == 0 and not is_spoofing) else -1
 
             self.current_index += 1
-            if self.current_index >= len(self.full_channel_data) or self.current_index >= len(self.ticker_data):
-                self.done = True
-
             next_state = self.get_state() if not self.done else None
             return next_state, reward, self.done
         except Exception as e:
@@ -112,17 +120,19 @@ class MarketEnvironment:
         try:
             full_row = self.full_channel_data.iloc[index]
             ticker_row = self.ticker_data.iloc[index]
-            weights = Config.FEATURE_WEIGHTS
-            scores = {
-                'order_flow_imbalance': np.log1p(abs(full_row['order_flow_imbalance'])),
-                'spread': np.log1p(abs(ticker_row['spread'])) if ticker_row['spread'] != 0 else 0,
-                'cancel_to_received_ratio': np.log1p(abs(full_row['cancel_to_received_ratio']))
-            }
-            return sum(weights[k] * scores[k] for k in weights)
+            scores = {feature: np.log1p(abs(row[feature])) for row in (full_row, ticker_row) for feature in Config.FEATURE_WEIGHTS if feature in row}
+            return sum(Config.FEATURE_WEIGHTS.get(k, 0) * v for k, v in scores.items())
         except Exception as e:
             logging.error(f"Error calculating anomaly score at index {index}: {e}")
             raise
 
+    def update_threshold(self):
+        """ 
+        Dynamically updates the spoofing threshold based on recent anomaly scores to adapt to new data trends. 
+        """
+        recent_scores = [self.calculate_anomaly_score(i) for i in range(max(0, self.current_index - 50), self.current_index)]
+        if recent_scores:
+            self.spoofing_threshold = np.percentile(recent_scores, 75)  # Update to 75th percentile of recent scores
 
 # Test
 if __name__ == "__main__":

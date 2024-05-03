@@ -48,9 +48,23 @@ class Config:
     DEFAULT_SPOOFING_THRESHOLD = 0.8  # Default spoofing threshold for normal runs
     HISTORY_WINDOW_SIZE = 10
     FEATURE_WEIGHTS = {  # Feature weights used in anomaly score calculations
-        'order_flow_imbalance': 0.3,
-        'spread': 0.4,
-        'cancel_to_received_ratio': 0.3
+        'order_flow_imbalance': 0.15,
+        'cancel_to_received_ratio': 0.15,
+        'price_5_std': 0.05,
+        'price_10_std': 0.05,
+        'price_15_std': 0.05,
+        'size_5_var': 0.05,
+        'size_10_var': 0.05,
+        'size_15_var': 0.05,
+        'spread': 0.10,
+        'last_size_5_var': 0.05,
+        'last_size_10_var': 0.05,
+        'hour_of_day': 0.15,  # Higher weight as temporal context is crucial
+        'hour_15': 0.025,
+        'hour_16': 0.025,
+        'hour_17': 0.025,
+        'hour_18': 0.025,
+        'hour_19': 0.025
     }
     TRAIN_TEST_SPLIT_RATIO = 0.7 # Training configuration
     RANDOM_SEED = 42  # Seed for any random operations to ensure reproducibility
