@@ -3,20 +3,14 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
-from market_env import MarketEnvironment
-from config import Config
-import logging
+from src.utils.log_config import setup_logger
+from src.config import Config
+from src.market_env import MarketEnvironment
 
 
 # Set up logging to save environment logs for debugging purposes
-logging.basicConfig(
-    level=Config.LOG_LEVEL,
-    format=Config.LOG_FORMAT,
-    handlers=[
-        logging.FileHandler(Config.LOG_PPO_POLICY_NETWORK_PATH, mode='w'),  # Log file overwritten at each run
-        logging.StreamHandler()
-    ]
-)
+logger = setup_logger(Config.LOG_PPO_POLICY_NETWORK_PATH)
+
 
 class PPOPolicyNetwork(nn.Module):
     """ 
@@ -128,10 +122,10 @@ if __name__ == "__main__":
         dist = policy_net(state_tensor)
         action = dist.sample()
         next_state, reward, done = env.step(action.item())
-        logging.info(f"Reward: {reward}")
-        logging.debug(f"New State: {next_state if next_state is not None else 'End of Data'}")
+        logger.info(f"Reward: {reward}")
+        logger.debug(f"New State: {next_state if next_state is not None else 'End of Data'}")
         if not done:
             state = next_state
 
     torch.save(policy_net.state_dict(), Config.PPO_POLICY_NETWORK_MODEL_PATH)
-    logging.info("Training complete, model saved.")
+    logger.info("Training complete, model saved.")
