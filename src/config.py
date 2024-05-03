@@ -35,6 +35,7 @@ class Config:
     LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
     LOG_MARKET_ENV_PATH = OUTPUT_PATH + 'market_env.log'
     LOG_PPO_POLICY_NETWORK_PATH = OUTPUT_PATH + 'ppo_policy_network.log'
+    LOG_TRAIN_PATH = OUTPUT_PATH + 'train.log'
 
     # Data preprocessing parameters
     CATEGORICAL_COLUMNS = ['type', 'side', 'reason']

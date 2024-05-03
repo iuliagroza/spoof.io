@@ -1,86 +1,70 @@
 import torch
-import numpy as np
+from torch.distributions import Categorical
 from torch import optim
-from market_env import MarketEnvironment
-from ppo_policy_network import PPOPolicyNetwork, compute_returns, ppo_update
-from config import Config
+from src.config import Config
+from src.market_env import MarketEnvironment
+from src.ppo_policy_network import PPOPolicyNetwork, ppo_update, get_discounted_rewards, compute_advantages
+from src.utils.log_config import setup_logger
 
-def safe_float_convert(data):
-    try:
-        return np.float32(data)
-    except ValueError:
-        return np.nan  # Replace non-convertible elements with NaN
 
-def train_ppo(env, policy_net, optimizer):
-    max_frames = 15000
-    frame_idx = 0
-    train_rewards = []
+# Set up logging for training
+logger = setup_logger(__name__, Config.LOG_TRAIN_PATH)
 
+
+def main():
+    # Initialize the market environment
+    env = MarketEnvironment()
     state = env.reset()
-    state = np.array([safe_float_convert(x) for x in state], dtype=np.float32)
-    state = torch.tensor(state).unsqueeze(0)  # Ensure state is correctly formatted
+    num_features = len(state)
+    num_actions = 2  # 0 for no action, 1 for spoofing action
 
-    while frame_idx < max_frames:
-        log_probs = []
-        values = []
-        states = []
-        actions = []
-        rewards = []
-        masks = []
-        entropy = 0
+    # Initialize the PPO policy network and optimizer
+    network = PPOPolicyNetwork(num_features, num_actions)
+    optimizer = optim.Adam(network.parameters(), lr=Config.PPO_CONFIG['learning_rate'])
 
+    # Main training loop
+    done = False
+    while not done:
+        states, actions, rewards, log_probs, values = [], [], [], [], []
         for _ in range(Config.PPO_CONFIG['n_steps']):
-            dist = policy_net(state)
-            if torch.any(torch.isnan(dist.probs)):
-                print("NaN detected in action probabilities, skipping update.")
-                continue
-
+            state = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
+            logits = network(state)
+            dist = Categorical(logits=logits)
             action = dist.sample()
             log_prob = dist.log_prob(action)
-            entropy += dist.entropy().mean()
+            value = logits.mean()  # Approximate the value function
 
-            next_state, reward, done = env.step(action.item())
-            if next_state is not None:
-                next_state = np.array([safe_float_convert(x) for x in next_state], dtype=np.float32)
-                next_state = torch.tensor(next_state).unsqueeze(0)
-
-            log_probs.append(log_prob)
-            values.append(dist.mean())
-            rewards.append(reward)
-            masks.append(1 - done)
             states.append(state)
             actions.append(action)
+            log_probs.append(log_prob)
+            values.append(value)
 
-            state = next_state if not done else torch.tensor(env.reset()).unsqueeze(0)
-            frame_idx += 1
+            state, reward, done, anomaly_score, spoofing_threshold = env.step(action.item())
+            rewards.append(reward)
 
             if done:
                 break
 
-        next_value = 0 if done else policy_net(next_state).mean().detach()
-        returns = compute_returns(next_value, rewards, masks, Config.PPO_CONFIG['gamma'])
+        # Prepare for PPO update
+        next_value = logits.mean().item() if not done else 0
+        discounted_rewards = get_discounted_rewards(rewards + [next_value], Config.PPO_CONFIG['gamma'])
+        advantages = compute_advantages(rewards, values + [next_value], Config.PPO_CONFIG['gamma'], Config.PPO_CONFIG['gae_lambda'])
 
-        log_probs = torch.cat(log_probs)
-        returns = torch.cat(returns).detach()
-        values = torch.cat(values)
+        # Convert lists to tensors for PPO update
         states = torch.cat(states)
-        actions = torch.cat(actions)
-        advantage = returns - values
+        actions = torch.tensor(actions)
+        log_probs = torch.tensor(log_probs)
+        returns = torch.tensor(discounted_rewards[:-1])
+        advantages = torch.tensor(advantages)
 
-        ppo_update(policy_net, optimizer, Config.PPO_CONFIG['n_epochs'], Config.PPO_CONFIG['batch_size'], states, actions, log_probs, returns, advantage, Config.PPO_CONFIG['clip_range'])
+        # Perform PPO update
+        loss = ppo_update(network, optimizer, states, actions, log_probs, advantages, returns, Config.PPO_CONFIG['clip_range'])
+        logger.info(f"Loss: {loss}, Last Reward: {rewards[-1]}, Total Steps: {_ + 1}")
 
-        average_reward = sum(rewards) / len(rewards) if rewards else 0
-        train_rewards.append(average_reward)
-        print(f"Frame: {frame_idx}, Average Reward: {average_reward}")
+    # Save the trained model
+    torch.save(network.state_dict(), Config.PPO_POLICY_NETWORK_MODEL_PATH)
+    logger.info("Training complete and model saved.")
 
-    torch.save(policy_net.state_dict(), Config.MODEL_SAVE_PATH + 'final_policy_network.pth')
-    print("Training complete, model saved.")
 
 if __name__ == "__main__":
-    train_env = MarketEnvironment(Config.PROCESSED_DATA_PATH + 'full_channel_enhanced.csv',
-                                  Config.PROCESSED_DATA_PATH + 'ticker_enhanced.csv')
-    num_features = train_env.reset().shape[0]
-    policy_net = PPOPolicyNetwork(num_features, 3)
-    optimizer = optim.Adam(policy_net.parameters(), lr=Config.PPO_CONFIG['learning_rate'], eps=1e-5)  # Added eps to prevent division by zero in Adam optimizer
-
-    train_ppo(train_env, policy_net, optimizer)
+    main()
