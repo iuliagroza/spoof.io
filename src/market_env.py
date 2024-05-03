@@ -91,11 +91,19 @@ class MarketEnvironment:
         Generates the current state by concatenating historical features from both full channel and ticker datasets.
 
         Returns:
-            np.array: Concatenated array of historical market features.
+            np.array: Concatenated array of historical market features, ensuring all data types are floats.
         """
         try:
-            full_channel_features = self.full_channel_data.iloc[self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index].values.flatten()
-            ticker_features = self.ticker_data.iloc[self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index].values.flatten()
+            # Ensure all values are floats
+            full_channel_features = self.full_channel_data.iloc[
+                self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index
+            ].astype(float).values.flatten()
+
+            ticker_features = self.ticker_data.iloc[
+                self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index
+            ].astype(float).values.flatten()
+
+            # Concatenate and return
             return np.concatenate([full_channel_features, ticker_features])
         except Exception as e:
             logger.error(f"Failed to retrieve state at index {self.current_index}: {e}")

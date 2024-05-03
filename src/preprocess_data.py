@@ -120,7 +120,7 @@ def preprocess_ticker_data(data):
         data = add_time_features(data)
         if data is None:
             return None
-        data.drop(columns=['type', 'product_id', 'low_24h'], inplace=True)
+        data.drop(columns=['type', 'product_id', 'time', 'low_24h'], inplace=True)
 
         numeric_cols = ['price', 'open_24h', 'volume_24h', 'high_24h', 'volume_30d', 'best_bid', 'best_ask', 'last_size']
         data[numeric_cols] = MinMaxScaler().fit_transform(data[numeric_cols])
