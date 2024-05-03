@@ -6,7 +6,7 @@ from src.utils.log_config import setup_logger
 from src.config import Config
 
 
-# Set up logging
+# Set up logging to save environment logs for debugging purposes
 logger = setup_logger('test', Config.LOG_TEST_PATH)
 
 
