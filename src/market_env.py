@@ -1,18 +1,11 @@
 import numpy as np
-import logging
+from src.utils.log_config import setup_logger
 from src.utils.load_csv_data import load_csv_data
 from src.config import Config
 
 
 # Set up logging to save environment logs for debugging purposes
-logging.basicConfig(
-    level=Config.LOG_LEVEL,
-    format=Config.LOG_FORMAT,
-    handlers=[
-        logging.FileHandler(Config.LOG_MARKET_ENV_PATH, mode='w'),  # Log file overwritten at each run
-        logging.StreamHandler()
-    ]
-)
+logger = setup_logger(Config.LOG_MARKET_ENV_PATH)
 
 
 class MarketEnvironment:
@@ -32,7 +25,7 @@ class MarketEnvironment:
             self.full_channel_data, self.ticker_data = load_csv_data(Config.FULL_CHANNEL_ENHANCED_PATH, Config.TICKER_ENHANCED_PATH)
             self.split_data(train)
         except Exception as e:
-            logging.error(f"Failed to load data with error: {e}")
+            logger.error(f"Failed to load data with error: {e}")
             raise
 
         self.current_index = max(initial_index, Config.HISTORY_WINDOW_SIZE)
@@ -82,6 +75,7 @@ class MarketEnvironment:
 
         try:
             anomaly_score = self.calculate_anomaly_score(self.current_index)
+            logger.info(f"Anomaly score: {anomaly_score}. Spoofing threshold: {self.spoofing_threshold}")
             is_spoofing = anomaly_score > self.spoofing_threshold
             reward = 1 if (action == 1 and is_spoofing) or (action == 0 and not is_spoofing) else -1
 
@@ -89,7 +83,7 @@ class MarketEnvironment:
             next_state = self.get_state() if not self.done else None
             return next_state, reward, self.done
         except Exception as e:
-            logging.error(f"An error occurred during the environment step: {e}")
+            logger.error(f"An error occurred during the environment step: {e}")
             raise
 
     def get_state(self):
@@ -104,7 +98,7 @@ class MarketEnvironment:
             ticker_features = self.ticker_data.iloc[self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index].values.flatten()
             return np.concatenate([full_channel_features, ticker_features])
         except Exception as e:
-            logging.error(f"Failed to retrieve state at index {self.current_index}: {e}")
+            logger.error(f"Failed to retrieve state at index {self.current_index}: {e}")
             raise
 
     def calculate_anomaly_score(self, index):
@@ -123,7 +117,7 @@ class MarketEnvironment:
             scores = {feature: np.log1p(abs(row[feature])) for row in (full_row, ticker_row) for feature in Config.FEATURE_WEIGHTS if feature in row}
             return sum(Config.FEATURE_WEIGHTS.get(k, 0) * v for k, v in scores.items())
         except Exception as e:
-            logging.error(f"Error calculating anomaly score at index {index}: {e}")
+            logger.error(f"Error calculating anomaly score at index {index}: {e}")
             raise
 
     def update_threshold(self):
@@ -134,6 +128,7 @@ class MarketEnvironment:
         if recent_scores:
             self.spoofing_threshold = np.percentile(recent_scores, 75)  # Update to 75th percentile of recent scores
 
+
 # Test
 if __name__ == "__main__":
     env = MarketEnvironment()
@@ -142,8 +137,11 @@ if __name__ == "__main__":
         action = np.random.choice([0, 1])  # Randomly choose action
         try:
             state, reward, done = env.step(action)
-            logging.info(f"Reward: {reward}")
-            logging.debug(f"New State: {state if state is not None else 'End of Data'}")
+            logger.info(f"Action: {action if reward != 0 else 'None'}, Reward: {reward}")
+            logger.debug(f"New State: {state if state is not None else 'End of Data'}")
+
+            if done:
+                logger.info("Simulation ended.")
         except Exception as e:
-            logging.error(f"An error occurred during the simulation: {e}")
+            logger.error(f"An error occurred during the simulation: {e}")
             break

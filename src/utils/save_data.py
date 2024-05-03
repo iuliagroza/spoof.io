@@ -1,10 +1,10 @@
 import pandas as pd
-import logging
 import os
-from ..config import Config
+from src.utils.log_config import setup_logger
+from src.config import Config
 
 
-logging.basicConfig(level=Config.LOG_LEVEL, format=Config.LOG_FORMAT)
+logger = setup_logger()
 
 
 def save_data(full_channel_df, ticker_df, full_channel_path, ticker_path):
@@ -19,37 +19,37 @@ def save_data(full_channel_df, ticker_df, full_channel_path, ticker_path):
     """
     # Save full channel DataFrame
     if full_channel_df.empty:
-        logging.warning(f"No data to save. The full channel DataFrame is empty.")
+        logger.warning(f"No data to save. The full channel DataFrame is empty.")
         return
 
     os.makedirs(os.path.dirname(full_channel_path), exist_ok=True)
 
     try:
         full_channel_df.to_csv(full_channel_path, index=False)
-        logging.info(f"Full channel data successfully saved to {full_channel_path}")
+        logger.info(f"Full channel data successfully saved to {full_channel_path}")
     except pd.errors.EmptyDataError:
-        logging.error(f"No data to write to file: {full_channel_path}")
+        logger.error(f"No data to write to file: {full_channel_path}")
     except IOError as e:
-        logging.error(f"IOError when trying to write file {full_channel_path}: {e}")
+        logger.error(f"IOError when trying to write file {full_channel_path}: {e}")
     except Exception as e:
-        logging.error(f"An unexpected error occurred while saving data to {full_channel_path}: {e}")
+        logger.error(f"An unexpected error occurred while saving data to {full_channel_path}: {e}")
     
     # Save ticker DataFrame
     if ticker_df.empty:
-        logging.warning(f"No data to save. The ticker DataFrame is empty.")
+        logger.warning(f"No data to save. The ticker DataFrame is empty.")
         return
 
     os.makedirs(os.path.dirname(ticker_path), exist_ok=True)
 
     try:
         ticker_df.to_csv(ticker_path, index=False)
-        logging.info(f"Ticker data successfully saved to {ticker_path}")
+        logger.info(f"Ticker data successfully saved to {ticker_path}")
     except pd.errors.EmptyDataError:
-        logging.error(f"No data to write to file: {ticker_path}")
+        logger.error(f"No data to write to file: {ticker_path}")
     except IOError as e:
-        logging.error(f"IOError when trying to write file {ticker_path}: {e}")
+        logger.error(f"IOError when trying to write file {ticker_path}: {e}")
     except Exception as e:
-        logging.error(f"An unexpected error occurred while saving data to {ticker_path}: {e}")
+        logger.error(f"An unexpected error occurred while saving data to {ticker_path}: {e}")
  
 
 # Test

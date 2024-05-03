@@ -3,13 +3,13 @@ from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
+from src.utils.log_config import setup_logger
 from src.utils.load_json_data import load_json_data
 from src.utils.save_data import save_data
 from src.config import Config
-import logging
 
 
-logging.basicConfig(level=Config.LOG_LEVEL, format=Config.LOG_FORMAT)
+logger = setup_logger()
 
 
 def add_time_features(data):
@@ -27,10 +27,10 @@ def add_time_features(data):
         data['hour_of_day'] = data['time'].dt.hour
         return data
     except KeyError as e:
-        logging.error(f"Error: The 'time' column is missing. {e}")
+        logger.error(f"Error: The 'time' column is missing. {e}")
         return None
     except Exception as e:
-        logging.error(f"An error occurred while adding time features. {e}")
+        logger.error(f"An error occurred while adding time features. {e}")
         return None
 
 
@@ -47,7 +47,7 @@ def create_numeric_transformer():
             ('scaler', MinMaxScaler())
         ])
     except Exception as e:
-        logging.error(f"An error occurred while creating the numeric transformer. {e}")
+        logger.error(f"An error occurred while creating the numeric transformer. {e}")
         return None
 
 
@@ -64,7 +64,7 @@ def create_categorical_transformer():
             ('onehot', OneHotEncoder(handle_unknown='ignore'))
         ])
     except Exception as e:
-        logging.error(f"An error occurred while creating the categorical transformer. {e}")
+        logger.error(f"An error occurred while creating the categorical transformer. {e}")
         return None
 
 
@@ -99,10 +99,10 @@ def preprocess_full_channel_data(data):
 
         return data_processed
     except KeyError as e:
-        logging.error(f"Error: A required column is missing. {e}")
+        logger.error(f"Error: A required column is missing. {e}")
         return None
     except Exception as e:
-        logging.error(f"An error occurred while preprocessing full channel data. {e}")
+        logger.error(f"An error occurred while preprocessing full channel data. {e}")
         return None
 
 
@@ -128,10 +128,10 @@ def preprocess_ticker_data(data):
         data = pd.get_dummies(data, columns=['side'], drop_first=False)
         return data
     except KeyError as e:
-        logging.error(f"Error: A required column is missing. {e}")
+        logger.error(f"Error: A required column is missing. {e}")
         return None
     except Exception as e:
-        logging.error(f"An error occurred while preprocessing ticker data. {e}")
+        logger.error(f"An error occurred while preprocessing ticker data. {e}")
         return None
     
 
@@ -140,29 +140,29 @@ def preprocess_data():
     Main function to load, process, and save the preprocessed full channel and ticker data.
     """
     try:
-        logging.info("Loading raw data...")
+        logger.info("Loading raw data...")
         full_channel, ticker = load_json_data()
     except Exception as e:
-        logging.error(f"An error occurred while loading data. {e}")
+        logger.error(f"An error occurred while loading data. {e}")
         return
 
     full_channel_processed = preprocess_full_channel_data(full_channel)
     if full_channel_processed is None:
-        logging.error("Full channel data preprocessing failed.")
+        logger.error("Full channel data preprocessing failed.")
         return
 
     ticker_processed = preprocess_ticker_data(ticker)
     if ticker_processed is None:
-        logging.error("Ticker data preprocessing failed.")
+        logger.error("Ticker data preprocessing failed.")
         return
 
     try:
-        logging.info("Saving preprocessed datasets...")
+        logger.info("Saving preprocessed datasets...")
         save_data(full_channel_processed, ticker_processed, Config.FULL_CHANNEL_PROCESSED_PATH, Config.TICKER_PROCESSED_PATH)
 
-        logging.info("Data preprocessing complete and files saved.")
+        logger.info("Data preprocessing complete and files saved.")
     except Exception as e:
-        logging.error(f"An error occurred while saving data. {e}")
+        logger.error(f"An error occurred while saving data. {e}")
 
 
 # Test
