@@ -5,7 +5,7 @@ from src.utils.save_data import save_data
 from src.config import Config
 
 
-logger = setup_logger(__name__)
+logger = setup_logger('extract_features')
 
 
 def calculate_rolling_stats(data, column):

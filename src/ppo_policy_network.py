@@ -8,7 +8,7 @@ from src.market_env import MarketEnvironment
 
 
 # Set up logging to save environment logs for debugging purposes
-logger = setup_logger(__name__, Config.LOG_PPO_POLICY_NETWORK_PATH)
+logger = setup_logger('ppo_policy_network', Config.LOG_PPO_POLICY_NETWORK_PATH)
 
 
 class PPOPolicyNetwork(nn.Module):

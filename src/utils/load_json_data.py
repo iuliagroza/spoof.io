@@ -4,7 +4,7 @@ from src.utils.log_config import setup_logger
 from src.config import Config
 
 
-logger = setup_logger(__name__)
+logger = setup_logger('load_json_data')
 
 
 def load_json_file(file_path):

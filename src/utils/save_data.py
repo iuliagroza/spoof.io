@@ -4,7 +4,7 @@ from src.utils.log_config import setup_logger
 from src.config import Config
 
 
-logger = setup_logger(__name__)
+logger = setup_logger('save_data')
 
 
 def save_data(full_channel_df, ticker_df, full_channel_path, ticker_path):
