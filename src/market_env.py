@@ -26,7 +26,7 @@ class MarketEnvironment:
             self.split_data(train)
         except Exception as e:
             logger.error(f"Failed to load data with error: {e}")
-            raise
+            raise Exception(f"Data loading failed: {e}")
 
         self.current_index = max(initial_index, Config.HISTORY_WINDOW_SIZE)
         self.done = False
@@ -36,15 +36,22 @@ class MarketEnvironment:
     def split_data(self, train):
         """ 
         Splits the data into training or testing segments based on the configuration ratio.
+
+        Args:
+            train (bool): Determines whether the split is for training or testing purposes.
         """
-        split_idx_full = int(len(self.full_channel_data) * Config.TRAIN_TEST_SPLIT_RATIO)
-        split_idx_ticker = int(len(self.ticker_data) * Config.TRAIN_TEST_SPLIT_RATIO)
-        if train:
-            self.full_channel_data = self.full_channel_data[:split_idx_full]
-            self.ticker_data = self.ticker_data[:split_idx_ticker]
-        else:
-            self.full_channel_data = self.full_channel_data[split_idx_full:]
-            self.ticker_data = self.ticker_data[split_idx_ticker:]
+        try:
+            split_idx_full = int(len(self.full_channel_data) * Config.TRAIN_TEST_SPLIT_RATIO)
+            split_idx_ticker = int(len(self.ticker_data) * Config.TRAIN_TEST_SPLIT_RATIO)
+            if train:
+                self.full_channel_data = self.full_channel_data[:split_idx_full]
+                self.ticker_data = self.ticker_data[:split_idx_ticker]
+            else:
+                self.full_channel_data = self.full_channel_data[split_idx_full:]
+                self.ticker_data = self.ticker_data[split_idx_ticker:]
+        except Exception as e:
+            logger.error(f"Failed to split data with error: {e}")
+            raise Exception(f"Data splitting failed: {e}")
 
     def reset(self):
         """
@@ -60,14 +67,14 @@ class MarketEnvironment:
 
     def step(self, action):
         """
-        Processes the agent's action and returns the new state, reward, and a flag indicating if the episode is done.
+        Processes the agent's action and returns the new state, reward, and status if the episode is done.
+        Additionally, it returns the anomaly score and spoofing threshold for detailed tracking.
 
         Args:
-            action (int): The action taken by the agent (0 or 1).
+            action (int): The action taken by the agent (0 or 1, where 1 might represent spoofing detection).
 
         Returns:
-            tuple: A tuple containing the next state (np.array or None), the reward (int), the done flag (bool), anomaly score (float, between[0,1]), and
-            the spoofing threshold of the current episode (float, between[0,1]).
+            tuple: Contains the next state (np.array or None), reward (int), done status (bool), anomaly score (float), and spoofing threshold (float).
         """
         # Terminal state reached: neutral outcome (reward "zero")
         if self.current_index >= len(self.full_channel_data) or self.current_index >= len(self.ticker_data):
@@ -84,7 +91,7 @@ class MarketEnvironment:
             return next_state, reward, self.done, anomaly_score, self.spoofing_threshold
         except Exception as e:
             logger.error(f"An error occurred during the environment step: {e}")
-            raise
+            raise Exception(f"Step processing failed: {e}")
 
     def get_state(self):
         """
@@ -94,7 +101,6 @@ class MarketEnvironment:
             np.array: Concatenated array of historical market features, ensuring all data types are floats.
         """
         try:
-            # Ensure all values are floats
             full_channel_features = self.full_channel_data.iloc[
                 self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index
             ].astype(float).values.flatten()
@@ -103,11 +109,10 @@ class MarketEnvironment:
                 self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index
             ].astype(float).values.flatten()
 
-            # Concatenate and return
             return np.concatenate([full_channel_features, ticker_features])
         except Exception as e:
             logger.error(f"Failed to retrieve state at index {self.current_index}: {e}")
-            raise
+            raise Exception(f"State retrieval failed: {e}")
 
     def calculate_anomaly_score(self, index):
         """
@@ -117,7 +122,7 @@ class MarketEnvironment:
             index (int): Index of the current state in the dataset.
 
         Returns:
-            float: Computed anomaly score.
+            float: Computed anomaly score, a higher score suggests higher likelihood of spoofing.
         """
         try:
             full_row = self.full_channel_data.iloc[index]
@@ -126,15 +131,18 @@ class MarketEnvironment:
             return sum(Config.FEATURE_WEIGHTS.get(k, 0) * v for k, v in scores.items())
         except Exception as e:
             logger.error(f"Error calculating anomaly score at index {index}: {e}")
-            raise
+            raise Exception(f"Anomaly score calculation failed: {e}")
 
     def update_threshold(self):
-        """ 
-        Dynamically updates the spoofing threshold based on recent anomaly scores to adapt to new data trends. 
         """
-        recent_scores = [self.calculate_anomaly_score(i) for i in range(max(0, self.current_index - 50), self.current_index)]
-        if recent_scores:
-            self.spoofing_threshold = np.percentile(recent_scores, 75)  # Update to 75th percentile of recent scores
+        Dynamically updates the spoofing threshold based on recent anomaly scores to adapt to changing market conditions.
+        """
+        try:
+            recent_scores = [self.calculate_anomaly_score(i) for i in range(max(0, self.current_index - 50), self.current_index)]
+            self.spoofing_threshold = np.percentile(recent_scores, 75)
+        except Exception as e:
+            logger.error(f"Failed to update spoofing threshold: {e}")
+            raise Exception(f"Updating spoofing threshold failed: {e}")
 
 
 # Test
@@ -145,9 +153,7 @@ if __name__ == "__main__":
         action = np.random.choice([0, 1])  # Randomly choose action
         try:
             state, reward, done, anomaly_score, spoofing_threshold = env.step(action)
-            logger.info(f"Action: {action if reward != 0 else 'None'}, Reward: {reward}, Anomaly Score: {anomaly_score}, Spoofing Threshold: {spoofing_threshold}")
-            logger.debug(f"New State: {state if state is not None else 'End of Data'}")
-
+            logger.info(f"Action: {action}, Reward: {reward}, Anomaly Score: {anomaly_score}, Spoofing Threshold: {spoofing_threshold}")
             if done:
                 logger.info("Simulation ended.")
         except Exception as e:
