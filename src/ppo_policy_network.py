@@ -2,12 +2,11 @@ from torch.distributions import Categorical
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import numpy as np
 from src.market_env import MarketEnvironment
 from src.utils.log_config import setup_logger
 from src.config import Config
 
-# Setup logging
+# Set up logging to save environment logs for debugging purposes
 logger = setup_logger(Config.LOG_PPO_POLICY_NETWORK_PATH)
 
 class PPOPolicyNetwork(nn.Module):
@@ -24,6 +23,7 @@ class PPOPolicyNetwork(nn.Module):
     def forward(self, x):
         return self.layers(x)
 
+
 def get_discounted_rewards(rewards, gamma):
     discounted_rewards = []
     R = 0
@@ -31,6 +31,7 @@ def get_discounted_rewards(rewards, gamma):
         R = r + gamma * R
         discounted_rewards.insert(0, R)
     return discounted_rewards
+
 
 def compute_advantages(rewards, values, gamma, lam):
     advantages = []
@@ -40,6 +41,7 @@ def compute_advantages(rewards, values, gamma, lam):
         last_adv = delta + gamma * lam * last_adv
         advantages.insert(0, last_adv)
     return advantages
+
 
 def ppo_update(network, optimizer, states, actions, old_log_probs, advantages, returns, clip_param):
     """
@@ -73,12 +75,13 @@ def ppo_update(network, optimizer, states, actions, old_log_probs, advantages, r
     optimizer.step()
 
     return loss.item()
+    
 
-
-def main():
+# Test
+if __name__ == "__main__":
     # Environment and Network setup
     env = MarketEnvironment()
-    num_features = len(env.reset())  # Number of features from environment's initial state
+    num_features = len(env.reset())
     num_actions = 2  # Binary actions: 0 (no spoofing), 1 (spoofing)
     network = PPOPolicyNetwork(num_features, num_actions)
     optimizer = optim.Adam(network.parameters(), lr=Config.PPO_CONFIG['learning_rate'])
@@ -88,13 +91,14 @@ def main():
     if state is not None:
         state = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
     done = False
-
     while not done and state is not None:
         log_probs = []
         values = []
         rewards = []
         states = []
         actions = []
+        anomaly_scores = []
+        spoofing_thresholds = []
         for _ in range(Config.PPO_CONFIG['n_steps']):
             logits = network(state)
             dist = Categorical(logits=logits)
@@ -107,10 +111,12 @@ def main():
             log_probs.append(log_prob)
             values.append(value)
 
-            state, reward, done = env.step(action.item())
+            state, reward, done, anomaly_score, spoofing_threshold = env.step(action.item())
             if state is not None:
                 state = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
             rewards.append(reward)
+            anomaly_scores.append(anomaly_score)
+            spoofing_thresholds.append(spoofing_threshold)
 
             if done:
                 logger.info("End of episode.")
@@ -133,12 +139,9 @@ def main():
 
         # PPO update
         ppo_update(network, optimizer, states, actions, log_probs, advantages, returns, Config.PPO_CONFIG['clip_range'])
-
+        logger.info(f"Step: {Config.PPO_CONFIG['n_steps']-1}, Action: {action.item()}, Reward: {reward}, Anomaly Score: {anomaly_scores[-1]}, Spoofing Threshold: {spoofing_thresholds[-1]}, Cumulative Reward: {sum(rewards)}, Next Value: {next_value}")
         logger.info(f"Completed {Config.PPO_CONFIG['n_steps']} steps with final reward: {rewards[-1]}")
 
     # Save model after training
     torch.save(network.state_dict(), Config.PPO_POLICY_NETWORK_MODEL_PATH)
     logger.info("Model training complete and saved.")
-
-if __name__ == "__main__":
-    main()

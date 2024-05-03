@@ -66,22 +66,22 @@ class MarketEnvironment:
             action (int): The action taken by the agent (0 or 1).
 
         Returns:
-            tuple: A tuple containing the next state (np.array or None), the reward (int), and the done flag (bool).
+            tuple: A tuple containing the next state (np.array or None), the reward (int), the done flag (bool), anomaly score (float, between[0,1]), and
+            the spoofing threshold of the current episode (float, between[0,1]).
         """
         # Terminal state reached: neutral outcome (reward "zero")
         if self.current_index >= len(self.full_channel_data) or self.current_index >= len(self.ticker_data):
             self.done = True
-            return None, 0, True
+            return None, 0, True, 0, self.spoofing_threshold
 
         try:
             anomaly_score = self.calculate_anomaly_score(self.current_index)
-            logger.info(f"Anomaly score: {anomaly_score}. Spoofing threshold: {self.spoofing_threshold}")
             is_spoofing = anomaly_score > self.spoofing_threshold
             reward = 1 if (action == 1 and is_spoofing) or (action == 0 and not is_spoofing) else -1
 
             self.current_index += 1
             next_state = self.get_state() if not self.done else None
-            return next_state, reward, self.done
+            return next_state, reward, self.done, anomaly_score, self.spoofing_threshold
         except Exception as e:
             logger.error(f"An error occurred during the environment step: {e}")
             raise
@@ -144,8 +144,8 @@ if __name__ == "__main__":
     while not env.done:
         action = np.random.choice([0, 1])  # Randomly choose action
         try:
-            state, reward, done = env.step(action)
-            logger.info(f"Action: {action if reward != 0 else 'None'}, Reward: {reward}")
+            state, reward, done, anomaly_score, spoofing_threshold = env.step(action)
+            logger.info(f"Action: {action if reward != 0 else 'None'}, Reward: {reward}, Anomaly Score: {anomaly_score}, Spoofing Threshold: {spoofing_threshold}")
             logger.debug(f"New State: {state if state is not None else 'End of Data'}")
 
             if done:
