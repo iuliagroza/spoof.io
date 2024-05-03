@@ -2,15 +2,28 @@ from torch.distributions import Categorical
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from src.market_env import MarketEnvironment
 from src.utils.log_config import setup_logger
 from src.config import Config
+from src.market_env import MarketEnvironment
+
 
 # Set up logging to save environment logs for debugging purposes
 logger = setup_logger(Config.LOG_PPO_POLICY_NETWORK_PATH)
 
+
 class PPOPolicyNetwork(nn.Module):
+    """
+    A neural network for implementing Proximal Policy Optimization (PPO).
+    """
+
     def __init__(self, num_features, num_actions):
+        """
+        Initializes the policy network with a simple feed-forward architecture.
+
+        Args:
+            num_features (int): Number of input features.
+            num_actions (int): Number of possible actions.
+        """
         super(PPOPolicyNetwork, self).__init__()
         self.layers = nn.Sequential(
             nn.Linear(num_features, 256),
@@ -21,10 +34,29 @@ class PPOPolicyNetwork(nn.Module):
         )
 
     def forward(self, x):
+        """
+        Forward pass through the network.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+
+        Returns:
+            torch.Tensor: Output tensor after passing through the network.
+        """
         return self.layers(x)
 
 
 def get_discounted_rewards(rewards, gamma):
+    """
+    Computes discounted rewards for reinforcement learning.
+
+    Args:
+        rewards (list): List of rewards.
+        gamma (float): Discount factor.
+
+    Returns:
+        list: List of discounted rewards.
+    """
     discounted_rewards = []
     R = 0
     for r in reversed(rewards):
@@ -34,6 +66,18 @@ def get_discounted_rewards(rewards, gamma):
 
 
 def compute_advantages(rewards, values, gamma, lam):
+    """
+    Computes the generalized advantage estimation (GAE).
+
+    Args:
+        rewards (list): List of rewards.
+        values (list): List of values estimated by the critic.
+        gamma (float): Discount factor.
+        lam (float): Lambda for GAE.
+
+    Returns:
+        list: List of advantage estimates.
+    """
     advantages = []
     last_adv = 0
     for t in reversed(range(len(rewards))):
@@ -46,7 +90,7 @@ def compute_advantages(rewards, values, gamma, lam):
 def ppo_update(network, optimizer, states, actions, old_log_probs, advantages, returns, clip_param):
     """
     Performs a Proximal Policy Optimization (PPO) update on the policy network.
-    
+
     Args:
         network (nn.Module): The policy network.
         optimizer (torch.optim.Optimizer): The optimizer.
@@ -56,6 +100,9 @@ def ppo_update(network, optimizer, states, actions, old_log_probs, advantages, r
         advantages (torch.Tensor): Computed advantages.
         returns (torch.Tensor): Discounted returns.
         clip_param (float): The clipping parameter for PPO.
+
+    Returns:
+        float: The loss after the update.
     """
     logits = network(states)
     dist = Categorical(logits=logits)
@@ -75,7 +122,7 @@ def ppo_update(network, optimizer, states, actions, old_log_probs, advantages, r
     optimizer.step()
 
     return loss.item()
-    
+
 
 # Test
 if __name__ == "__main__":
@@ -138,7 +185,8 @@ if __name__ == "__main__":
         advantages = torch.tensor(advantages)
 
         # PPO update
-        ppo_update(network, optimizer, states, actions, log_probs, advantages, returns, Config.PPO_CONFIG['clip_range'])
+        loss = ppo_update(network, optimizer, states, actions, log_probs, advantages, returns, Config.PPO_CONFIG['clip_range'])
+        logger.info(f"Loss after update: {loss}")
         logger.info(f"Step: {Config.PPO_CONFIG['n_steps']-1}, Action: {action.item()}, Reward: {reward}, Anomaly Score: {anomaly_scores[-1]}, Spoofing Threshold: {spoofing_thresholds[-1]}, Cumulative Reward: {sum(rewards)}, Next Value: {next_value}")
         logger.info(f"Completed {Config.PPO_CONFIG['n_steps']} steps with final reward: {rewards[-1]}")
 
