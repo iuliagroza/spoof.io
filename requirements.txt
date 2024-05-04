@@ -2,3 +2,4 @@ websocket-client==1.7.0
 matplotlib>=3.5.1
 pandas
 scikit-learn
+seaborn>=0.11.0

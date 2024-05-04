@@ -10,6 +10,7 @@ class Config:
     MISC_DATA_PATH = 'data/misc/'
     MODEL_SAVE_PATH = 'models/'
     OUTPUT_PATH = 'output/'
+    EVAL_PATH = 'eval/'
 
     # Full channel paths
     FULL_CHANNEL_RAW_17HR_PATH = RAW_DATA_PATH + 'FullChannel_GDAX_20220511_17hr.json'
@@ -29,6 +30,12 @@ class Config:
 
     # Model paths
     PPO_POLICY_NETWORK_MODEL_PATH = MODEL_SAVE_PATH + 'ppo_model.pth'
+
+    # Eval paths
+    TEST_RESULTS_PATH = EVAL_PATH + 'test_results.html'
+    ANOMALY_SCORES_PATH = EVAL_PATH + 'anomaly_scores.png'
+    CUMULATIVE_REWARDS_PATH = EVAL_PATH + 'cumulative_rewards.png'
+    REWARD_DISTRIBUTION_PATH = EVAL_PATH + 'reward_distribution.png'
 
     # Logging Configuration
     LOG_LEVEL = 'INFO'
