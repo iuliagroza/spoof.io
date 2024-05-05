@@ -19,6 +19,7 @@ class Config:
     FULL_CHANNEL_RAW_PATH = RAW_DATA_PATH + 'full_channel.csv'
     FULL_CHANNEL_PROCESSED_PATH = PROCESSED_DATA_PATH + 'full_channel_processed.csv'
     FULL_CHANNEL_ENHANCED_PATH = PROCESSED_DATA_PATH + 'full_channel_enhanced.csv'
+    FULL_CHANNEL_SIM_PATH = RAW_DATA_PATH + 'full_channel_sim.csv'
 
     # Ticker paths
     TICKER_RAW_17HR_PATH = RAW_DATA_PATH + 'Ticker_GDAX_20220511_17hr.json'
@@ -27,6 +28,7 @@ class Config:
     TICKER_RAW_PATH = RAW_DATA_PATH + 'ticker.csv'
     TICKER_PROCESSED_PATH = PROCESSED_DATA_PATH + 'ticker_processed.csv'
     TICKER_ENHANCED_PATH = PROCESSED_DATA_PATH + 'ticker_enhanced.csv'
+    TICKER_SIM_PATH = RAW_DATA_PATH + 'ticker_sim.csv'
 
     # Model paths
     PPO_POLICY_NETWORK_MODEL_PATH = MODEL_SAVE_PATH + 'ppo_model.pth'
