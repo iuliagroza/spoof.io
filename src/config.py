@@ -105,4 +105,7 @@ class Config:
         'n_epochs': [10, 20, 30],
         'spoofing_threshold': [0.7, 0.8, 0.9]
     }
+
+    # WEB APP SIMULATION
+    BATCH_SIZE = 15  # For feeding and processing live data 
     
