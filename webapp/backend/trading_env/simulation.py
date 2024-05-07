@@ -17,9 +17,9 @@ def print_spoofing_attempts(data):
         print("Detected Spoofing Attempts:")
         for index, row in spoofing_attempts.iterrows():
             print(f"Order ID: {index}")
-            print(f"Features (States): {row['states']}")
-            print(f"Anomaly Score: {row['anomaly_scores']}")
-            print(f"Threshold: {row['spoofing_thresholds']}\n")
+            # print(f"Features (States): {row['states']}")
+            # print(f"Anomaly Score: {row['anomaly_scores']}")
+            # print(f"Threshold: {row['spoofing_thresholds']}\n")
     else:
         print("No spoofing attempts detected in this batch.")
 
@@ -63,10 +63,12 @@ async def simulate_market_data():
             if len(full_channel_batch) == Config.BATCH_SIZE:
                 full_channel_df = pd.DataFrame(full_channel_batch)
                 ticker_df = pd.DataFrame(ticker_batch)
+                save_data(full_channel_df, ticker_df, Config.MISC_DATA_PATH + 'full_channel_df.csv', Config.MISC_DATA_PATH + 'ticker_df.csv')
 
                 # Preprocess and feature engineer
                 processed_full_channel = preprocess_full_channel_data(full_channel_df)
                 processed_ticker = preprocess_ticker_data(ticker_df)
+                save_data(processed_full_channel, processed_ticker, Config.MISC_DATA_PATH + 'full_channel_prep.csv', Config.MISC_DATA_PATH + 'ticker_prep.csv')
                 enhanced_full_channel = extract_full_channel_features(processed_full_channel)
                 enhanced_ticker = extract_ticker_features(processed_ticker)
 

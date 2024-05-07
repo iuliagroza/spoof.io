@@ -60,11 +60,20 @@ def create_categorical_transformer():
     """
     try:
         categories = Config.FULL_CHANNEL_CATEGORICAL_MAP
-        transformers = [(key, Pipeline([
+        transformers = []
+        for key in categories.keys():
+            transformer_pipeline = Pipeline([
+                ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+                ('onehot', OneHotEncoder(categories=[categories[key]], handle_unknown='ignore'))
+            ])
+            transformers.append((key, transformer_pipeline, [key]))
+        
+        # Handle all categorical columns with a default transformer in case some are completely NaN
+        default_transformer = Pipeline([
             ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
-            ('onehot', OneHotEncoder(categories=[categories[key]], handle_unknown='ignore'))
-        ]), [key]) for key in categories.keys()]
-        return ColumnTransformer(transformers)
+            ('onehot', OneHotEncoder(handle_unknown='ignore'))
+        ])
+        return ColumnTransformer(transformers, remainder=default_transformer)
     except Exception as e:
         logger.error(f"An error occurred while creating the categorical transformer. {e}")
         return None
@@ -116,6 +125,11 @@ def preprocess_full_channel_data(data):
         data = add_time_features(data)
         if data is None:
             return None
+
+        # Convert categorical columns to string to ensure type safety
+        for col in Config.FULL_CHANNEL_CATEGORICAL_COLUMNS:
+            data[col] = data[col].astype(str)
+
         data.fillna({'remaining_size': 0, 'price': data['price'].mean()}, inplace=True)
         data['remaining_size_change'] = data.groupby('order_id')['remaining_size'].diff().fillna(0)
 
