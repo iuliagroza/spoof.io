@@ -4,12 +4,27 @@
     overflow-y: auto;
     border-radius: 5px;
     min-width: 48%;
-    max-height: 700px;
+    max-height: 725px;
     margin: 0 1%;
-}
+    border: .5px solid #ccc;
 
-.orders-box h2 {
-    color: #ffffff;
+    table {
+        width: 100%;
+
+        th,
+        td {
+            text-align: center;
+        }
+
+        td {
+            border-top: .5px solid #ccc;
+        }
+
+        th {
+            background-color: #0b0f19;
+            color: white;
+        }
+    }
 }
 
 .orders-box ul {
@@ -20,5 +35,4 @@
 .orders-box li {
     margin: 10px 0;
     padding: 5px;
-    border-bottom: 1px solid #ccc;
 }
