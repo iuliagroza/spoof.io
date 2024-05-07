@@ -1,7 +1,6 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .simulation import MarketEnvironment
 import json
-import asyncio
 
 class TradingConsumer(AsyncWebsocketConsumer):
     async def connect(self):

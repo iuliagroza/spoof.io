@@ -27,6 +27,8 @@ class MarketEnvironment:
             if full_channel_data is None and ticker_data is None:
                 self.full_channel_data, self.ticker_data = load_csv_data(Config.FULL_CHANNEL_ENHANCED_PATH, Config.TICKER_ENHANCED_PATH)
                 self.split_data(train)
+            else:
+                self.full_channel_data, self.ticker_data = full_channel_data, ticker_data
         except Exception as e:
             logger.error(f"Failed to load data with error: {e}")
             raise Exception(f"Data loading failed: {e}")
