@@ -125,6 +125,10 @@ def preprocess_full_channel_data(data):
         data = add_time_features(data)
         if data is None:
             return None
+        
+        # Convert categorical columns to string to ensure type safety
+        for col in Config.FULL_CHANNEL_CATEGORICAL_COLUMNS:
+             data[col] = data[col].astype(str)
 
         if 'size' not in data.columns or data['size'].isna().all():
             data['size'] = 0

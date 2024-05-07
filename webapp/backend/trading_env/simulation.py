@@ -84,7 +84,7 @@ async def simulate_market_data():
                 ticker_batch = []
 
     except StopIteration:
-        pass  # End of data
+        print("End of data.")
 
     except Exception as e:
         print(f"An error occurred: {e}")
