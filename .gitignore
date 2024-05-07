@@ -8,6 +8,9 @@ data/misc
 node_modules
 /.pnp
 .pnp.js
+package-lock.json
+package.json
+manifest.json
 
 # testing
 /coverage
