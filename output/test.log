@@ -1,0 +1,133 @@
+2024-05-07 19:32:29,633 - INFO - Step: 1, Action: 0, Reward: -1, Anomaly Score: 0.623765262197657, Spoofing Threshold: 0.5241233250379896
+2024-05-07 19:32:29,634 - INFO - Step: 2, Action: 0, Reward: -1, Anomaly Score: 0.5329375373117639, Spoofing Threshold: 0.5241233250379896
+2024-05-07 19:32:29,635 - INFO - Step: 3, Action: 0, Reward: -1, Anomaly Score: 0.581182188467207, Spoofing Threshold: 0.5241233250379896
+2024-05-07 19:32:29,635 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.7291842189109576, Spoofing Threshold: 0.5241233250379896
+2024-05-07 19:32:29,636 - INFO - Step: 5, Action: 0, Reward: -1, Anomaly Score: 0.7497156177459754, Spoofing Threshold: 0.5241233250379896
+2024-05-07 19:32:29,636 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.5241233250379896
+2024-05-07 19:32:29,636 - INFO - Test completed. Total Reward: -5, Total Steps: 6
+2024-05-07 19:32:30,347 - INFO - Step: 1, Action: 0, Reward: 1, Anomaly Score: 0.6913046716328259, Spoofing Threshold: 0.7173254139083555
+2024-05-07 19:32:30,348 - INFO - Step: 2, Action: 0, Reward: -1, Anomaly Score: 0.7928224898221339, Spoofing Threshold: 0.7173254139083555
+2024-05-07 19:32:30,349 - INFO - Step: 3, Action: 0, Reward: -1, Anomaly Score: 0.8228381746844866, Spoofing Threshold: 0.7173254139083555
+2024-05-07 19:32:30,349 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.8205303850340637, Spoofing Threshold: 0.7173254139083555
+2024-05-07 19:32:30,350 - INFO - Step: 5, Action: 0, Reward: -1, Anomaly Score: 0.8213071906276082, Spoofing Threshold: 0.7173254139083555
+2024-05-07 19:32:30,350 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.7173254139083555
+2024-05-07 19:32:30,350 - INFO - Test completed. Total Reward: -3, Total Steps: 6
+2024-05-07 19:32:31,949 - INFO - Step: 1, Action: 0, Reward: -1, Anomaly Score: 0.6846600328620616, Spoofing Threshold: 0.6686030980663236
+2024-05-07 19:32:31,950 - INFO - Step: 2, Action: 0, Reward: 1, Anomaly Score: 0.619730031047425, Spoofing Threshold: 0.6686030980663236
+2024-05-07 19:32:31,951 - INFO - Step: 3, Action: 0, Reward: 1, Anomaly Score: 0.6214938083492426, Spoofing Threshold: 0.6686030980663236
+2024-05-07 19:32:31,952 - INFO - Step: 4, Action: 0, Reward: 1, Anomaly Score: 0.621609570695552, Spoofing Threshold: 0.6686030980663236
+2024-05-07 19:32:31,953 - INFO - Step: 5, Action: 0, Reward: 1, Anomaly Score: 0.6211844596799954, Spoofing Threshold: 0.6686030980663236
+2024-05-07 19:32:31,953 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.6686030980663236
+2024-05-07 19:32:31,953 - INFO - Test completed. Total Reward: 3, Total Steps: 6
+2024-05-07 19:32:32,954 - INFO - Step: 1, Action: 0, Reward: 1, Anomaly Score: 0.798097154125739, Spoofing Threshold: 0.8019640082182623
+2024-05-07 19:32:32,955 - INFO - Step: 2, Action: 0, Reward: -1, Anomaly Score: 0.8790389113087616, Spoofing Threshold: 0.8019640082182623
+2024-05-07 19:32:32,956 - INFO - Step: 3, Action: 0, Reward: -1, Anomaly Score: 0.8087648205664479, Spoofing Threshold: 0.8019640082182623
+2024-05-07 19:32:32,957 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.8063519358308825, Spoofing Threshold: 0.8019640082182623
+2024-05-07 19:32:32,957 - INFO - Step: 5, Action: 0, Reward: -1, Anomaly Score: 0.8860745608356954, Spoofing Threshold: 0.8019640082182623
+2024-05-07 19:32:32,958 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.8019640082182623
+2024-05-07 19:32:32,958 - INFO - Test completed. Total Reward: -3, Total Steps: 6
+2024-05-07 19:32:33,805 - INFO - Step: 1, Action: 0, Reward: -1, Anomaly Score: 0.8871245943616575, Spoofing Threshold: 0.7716675819227676
+2024-05-07 19:32:33,806 - INFO - Step: 2, Action: 0, Reward: -1, Anomaly Score: 0.8214125808997804, Spoofing Threshold: 0.7716675819227676
+2024-05-07 19:32:33,807 - INFO - Step: 3, Action: 0, Reward: -1, Anomaly Score: 0.8218202355234421, Spoofing Threshold: 0.7716675819227676
+2024-05-07 19:32:33,808 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.9260992982489578, Spoofing Threshold: 0.7716675819227676
+2024-05-07 19:32:33,809 - INFO - Step: 5, Action: 0, Reward: -1, Anomaly Score: 0.7950890489298656, Spoofing Threshold: 0.7716675819227676
+2024-05-07 19:32:33,809 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.7716675819227676
+2024-05-07 19:32:33,809 - INFO - Test completed. Total Reward: -5, Total Steps: 6
+2024-05-07 19:32:34,010 - INFO - Step: 1, Action: 0, Reward: 1, Anomaly Score: 0.6532406062158382, Spoofing Threshold: 0.709842990440004
+2024-05-07 19:32:34,011 - INFO - Step: 2, Action: 0, Reward: 1, Anomaly Score: 0.6324660748496252, Spoofing Threshold: 0.709842990440004
+2024-05-07 19:32:34,012 - INFO - Step: 3, Action: 0, Reward: 1, Anomaly Score: 0.5227225928980337, Spoofing Threshold: 0.709842990440004
+2024-05-07 19:32:34,012 - INFO - Step: 4, Action: 0, Reward: 1, Anomaly Score: 0.49522229179585664, Spoofing Threshold: 0.709842990440004
+2024-05-07 19:32:34,013 - INFO - Step: 5, Action: 0, Reward: 1, Anomaly Score: 0.49470940435500593, Spoofing Threshold: 0.709842990440004
+2024-05-07 19:32:34,013 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.709842990440004
+2024-05-07 19:32:34,013 - INFO - Test completed. Total Reward: 5, Total Steps: 6
+2024-05-07 19:32:34,795 - INFO - Step: 1, Action: 0, Reward: -1, Anomaly Score: 0.5918025814935683, Spoofing Threshold: 0.575415702802174
+2024-05-07 19:32:34,796 - INFO - Step: 2, Action: 0, Reward: -1, Anomaly Score: 0.6797827036866774, Spoofing Threshold: 0.575415702802174
+2024-05-07 19:32:34,797 - INFO - Step: 3, Action: 0, Reward: -1, Anomaly Score: 0.6926618708594865, Spoofing Threshold: 0.575415702802174
+2024-05-07 19:32:34,798 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.768666386223559, Spoofing Threshold: 0.575415702802174
+2024-05-07 19:32:34,798 - INFO - Step: 5, Action: 0, Reward: -1, Anomaly Score: 0.7738960918123504, Spoofing Threshold: 0.575415702802174
+2024-05-07 19:32:34,799 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.575415702802174
+2024-05-07 19:32:34,799 - INFO - Test completed. Total Reward: -5, Total Steps: 6
+2024-05-07 19:32:35,437 - INFO - Step: 1, Action: 0, Reward: 1, Anomaly Score: 0.6345604071562361, Spoofing Threshold: 0.6810234599762495
+2024-05-07 19:32:35,438 - INFO - Step: 2, Action: 0, Reward: 1, Anomaly Score: 0.6303699518343049, Spoofing Threshold: 0.6810234599762495
+2024-05-07 19:32:35,439 - INFO - Step: 3, Action: 0, Reward: 1, Anomaly Score: 0.6351419021011996, Spoofing Threshold: 0.6810234599762495
+2024-05-07 19:32:35,439 - INFO - Step: 4, Action: 0, Reward: 1, Anomaly Score: 0.6698840753640106, Spoofing Threshold: 0.6810234599762495
+2024-05-07 19:32:35,440 - INFO - Step: 5, Action: 0, Reward: 1, Anomaly Score: 0.6701584207671344, Spoofing Threshold: 0.6810234599762495
+2024-05-07 19:32:35,440 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.6810234599762495
+2024-05-07 19:32:35,440 - INFO - Test completed. Total Reward: 5, Total Steps: 6
+2024-05-07 19:32:36,971 - INFO - Step: 1, Action: 0, Reward: -1, Anomaly Score: 0.7020072321333759, Spoofing Threshold: 0.5998132191945372
+2024-05-07 19:32:36,972 - INFO - Step: 2, Action: 0, Reward: -1, Anomaly Score: 0.7009048174105557, Spoofing Threshold: 0.5998132191945372
+2024-05-07 19:32:36,973 - INFO - Step: 3, Action: 0, Reward: -1, Anomaly Score: 0.6201039599659013, Spoofing Threshold: 0.5998132191945372
+2024-05-07 19:32:36,974 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.6170537012444637, Spoofing Threshold: 0.5998132191945372
+2024-05-07 19:32:36,974 - INFO - Step: 5, Action: 0, Reward: -1, Anomaly Score: 0.6066705315796365, Spoofing Threshold: 0.5998132191945372
+2024-05-07 19:32:36,975 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.5998132191945372
+2024-05-07 19:32:36,975 - INFO - Test completed. Total Reward: -5, Total Steps: 6
+2024-05-07 19:32:39,431 - INFO - Step: 1, Action: 0, Reward: 1, Anomaly Score: 0.60115271225581, Spoofing Threshold: 0.650335366181583
+2024-05-07 19:32:39,432 - INFO - Step: 2, Action: 0, Reward: -1, Anomaly Score: 0.6594358697500201, Spoofing Threshold: 0.650335366181583
+2024-05-07 19:32:39,433 - INFO - Step: 3, Action: 0, Reward: -1, Anomaly Score: 0.7292926489050469, Spoofing Threshold: 0.650335366181583
+2024-05-07 19:32:39,434 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.7759469799498038, Spoofing Threshold: 0.650335366181583
+2024-05-07 19:32:39,435 - INFO - Step: 5, Action: 0, Reward: -1, Anomaly Score: 0.7670952088559521, Spoofing Threshold: 0.650335366181583
+2024-05-07 19:32:39,435 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.650335366181583
+2024-05-07 19:32:39,435 - INFO - Test completed. Total Reward: -3, Total Steps: 6
+2024-05-07 19:32:40,049 - INFO - Step: 1, Action: 0, Reward: 1, Anomaly Score: 0.6269243846365724, Spoofing Threshold: 0.6529126520176537
+2024-05-07 19:32:40,050 - INFO - Step: 2, Action: 0, Reward: 1, Anomaly Score: 0.624292546833099, Spoofing Threshold: 0.6529126520176537
+2024-05-07 19:32:40,051 - INFO - Step: 3, Action: 0, Reward: 1, Anomaly Score: 0.6419640001090036, Spoofing Threshold: 0.6529126520176537
+2024-05-07 19:32:40,052 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.7090582292367704, Spoofing Threshold: 0.6529126520176537
+2024-05-07 19:32:40,053 - INFO - Step: 5, Action: 0, Reward: 1, Anomaly Score: 0.6353039851047612, Spoofing Threshold: 0.6529126520176537
+2024-05-07 19:32:40,053 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.6529126520176537
+2024-05-07 19:32:40,053 - INFO - Test completed. Total Reward: 3, Total Steps: 6
+2024-05-07 19:32:40,882 - INFO - Step: 1, Action: 0, Reward: -1, Anomaly Score: 0.7903819021241012, Spoofing Threshold: 0.7646159648892827
+2024-05-07 19:32:40,883 - INFO - Step: 2, Action: 0, Reward: -1, Anomaly Score: 0.8497735481154696, Spoofing Threshold: 0.7646159648892827
+2024-05-07 19:32:40,884 - INFO - Step: 3, Action: 0, Reward: -1, Anomaly Score: 0.8431622279914783, Spoofing Threshold: 0.7646159648892827
+2024-05-07 19:32:40,885 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.8291766154372774, Spoofing Threshold: 0.7646159648892827
+2024-05-07 19:32:40,886 - INFO - Step: 5, Action: 0, Reward: -1, Anomaly Score: 0.8442196708895551, Spoofing Threshold: 0.7646159648892827
+2024-05-07 19:32:40,886 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.7646159648892827
+2024-05-07 19:32:40,886 - INFO - Test completed. Total Reward: -5, Total Steps: 6
+2024-05-07 19:32:41,811 - INFO - Step: 1, Action: 0, Reward: -1, Anomaly Score: 0.7983264256702848, Spoofing Threshold: 0.6646822795404848
+2024-05-07 19:32:41,812 - INFO - Step: 2, Action: 0, Reward: -1, Anomaly Score: 0.777885705893715, Spoofing Threshold: 0.6646822795404848
+2024-05-07 19:32:41,812 - INFO - Step: 3, Action: 0, Reward: -1, Anomaly Score: 0.7778617444228432, Spoofing Threshold: 0.6646822795404848
+2024-05-07 19:32:41,813 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.6991539351353845, Spoofing Threshold: 0.6646822795404848
+2024-05-07 19:32:41,814 - INFO - Step: 5, Action: 0, Reward: -1, Anomaly Score: 0.7075678561316288, Spoofing Threshold: 0.6646822795404848
+2024-05-07 19:32:41,814 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.6646822795404848
+2024-05-07 19:32:41,814 - INFO - Test completed. Total Reward: -5, Total Steps: 6
+2024-05-07 19:32:42,433 - INFO - Step: 1, Action: 0, Reward: -1, Anomaly Score: 0.6625852748834504, Spoofing Threshold: 0.6447515197663412
+2024-05-07 19:32:42,435 - INFO - Step: 2, Action: 0, Reward: -1, Anomaly Score: 0.6820767321602637, Spoofing Threshold: 0.6447515197663412
+2024-05-07 19:32:42,435 - INFO - Step: 3, Action: 0, Reward: -1, Anomaly Score: 0.6997289652863797, Spoofing Threshold: 0.6447515197663412
+2024-05-07 19:32:42,436 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.7002906196703906, Spoofing Threshold: 0.6447515197663412
+2024-05-07 19:32:42,437 - INFO - Step: 5, Action: 0, Reward: -1, Anomaly Score: 0.8183254766987289, Spoofing Threshold: 0.6447515197663412
+2024-05-07 19:32:42,438 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.6447515197663412
+2024-05-07 19:32:42,438 - INFO - Test completed. Total Reward: -5, Total Steps: 6
+2024-05-07 19:32:43,183 - INFO - Step: 1, Action: 0, Reward: -1, Anomaly Score: 0.7944087378309057, Spoofing Threshold: 0.731634223895145
+2024-05-07 19:32:43,184 - INFO - Step: 2, Action: 0, Reward: -1, Anomaly Score: 0.8021385977931512, Spoofing Threshold: 0.731634223895145
+2024-05-07 19:32:43,185 - INFO - Step: 3, Action: 0, Reward: -1, Anomaly Score: 0.7441600505390704, Spoofing Threshold: 0.731634223895145
+2024-05-07 19:32:43,186 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.8617938921181283, Spoofing Threshold: 0.731634223895145
+2024-05-07 19:32:43,187 - INFO - Step: 5, Action: 0, Reward: -1, Anomaly Score: 0.8249589570119734, Spoofing Threshold: 0.731634223895145
+2024-05-07 19:32:43,187 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.731634223895145
+2024-05-07 19:32:43,187 - INFO - Test completed. Total Reward: -5, Total Steps: 6
+2024-05-07 19:32:43,914 - INFO - Step: 1, Action: 0, Reward: -1, Anomaly Score: 0.8800422393434371, Spoofing Threshold: 0.7146098729066612
+2024-05-07 19:32:43,915 - INFO - Step: 2, Action: 0, Reward: -1, Anomaly Score: 0.8653339626877274, Spoofing Threshold: 0.7146098729066612
+2024-05-07 19:32:43,915 - INFO - Step: 3, Action: 0, Reward: -1, Anomaly Score: 0.8711557186351679, Spoofing Threshold: 0.7146098729066612
+2024-05-07 19:32:43,916 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.7639114003576069, Spoofing Threshold: 0.7146098729066612
+2024-05-07 19:32:43,917 - INFO - Step: 5, Action: 0, Reward: -1, Anomaly Score: 0.7870278933275688, Spoofing Threshold: 0.7146098729066612
+2024-05-07 19:32:43,917 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.7146098729066612
+2024-05-07 19:32:43,917 - INFO - Test completed. Total Reward: -5, Total Steps: 6
+2024-05-07 19:32:44,917 - INFO - Step: 1, Action: 0, Reward: -1, Anomaly Score: 0.732210116140294, Spoofing Threshold: 0.7049579696023903
+2024-05-07 19:32:44,918 - INFO - Step: 2, Action: 0, Reward: -1, Anomaly Score: 0.8422654764382536, Spoofing Threshold: 0.7049579696023903
+2024-05-07 19:32:44,919 - INFO - Step: 3, Action: 0, Reward: -1, Anomaly Score: 0.8606655908850309, Spoofing Threshold: 0.7049579696023903
+2024-05-07 19:32:44,920 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.7440035616140512, Spoofing Threshold: 0.7049579696023903
+2024-05-07 19:32:44,921 - INFO - Step: 5, Action: 0, Reward: -1, Anomaly Score: 0.7538844731607046, Spoofing Threshold: 0.7049579696023903
+2024-05-07 19:32:44,921 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.7049579696023903
+2024-05-07 19:32:44,921 - INFO - Test completed. Total Reward: -5, Total Steps: 6
+2024-05-07 19:32:45,907 - INFO - Step: 1, Action: 0, Reward: 1, Anomaly Score: 0.6930772924466811, Spoofing Threshold: 0.7285354238956612
+2024-05-07 19:32:45,908 - INFO - Step: 2, Action: 0, Reward: 1, Anomaly Score: 0.693620084676446, Spoofing Threshold: 0.7285354238956612
+2024-05-07 19:32:45,909 - INFO - Step: 3, Action: 0, Reward: 1, Anomaly Score: 0.6210800088596847, Spoofing Threshold: 0.7285354238956612
+2024-05-07 19:32:45,910 - INFO - Step: 4, Action: 0, Reward: 1, Anomaly Score: 0.6778038382463546, Spoofing Threshold: 0.7285354238956612
+2024-05-07 19:32:45,911 - INFO - Step: 5, Action: 0, Reward: 1, Anomaly Score: 0.6787615443709829, Spoofing Threshold: 0.7285354238956612
+2024-05-07 19:32:45,911 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.7285354238956612
+2024-05-07 19:32:45,911 - INFO - Test completed. Total Reward: 5, Total Steps: 6
+2024-05-07 19:32:46,636 - INFO - Step: 1, Action: 0, Reward: -1, Anomaly Score: 0.7896194658550336, Spoofing Threshold: 0.6691742151267532
+2024-05-07 19:32:46,637 - INFO - Step: 2, Action: 0, Reward: -1, Anomaly Score: 0.7406614462344517, Spoofing Threshold: 0.6691742151267532
+2024-05-07 19:32:46,637 - INFO - Step: 3, Action: 0, Reward: -1, Anomaly Score: 0.7175561122020132, Spoofing Threshold: 0.6691742151267532
+2024-05-07 19:32:46,638 - INFO - Step: 4, Action: 0, Reward: -1, Anomaly Score: 0.7182417659696972, Spoofing Threshold: 0.6691742151267532
+2024-05-07 19:32:46,639 - INFO - Step: 5, Action: 0, Reward: -1, Anomaly Score: 0.7826107792333865, Spoofing Threshold: 0.6691742151267532
+2024-05-07 19:32:46,639 - INFO - Step: 6, Action: 0, Reward: 0, Anomaly Score: 0, Spoofing Threshold: 0.6691742151267532
+2024-05-07 19:32:46,639 - INFO - Test completed. Total Reward: -5, Total Steps: 6

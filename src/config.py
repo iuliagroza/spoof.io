@@ -48,13 +48,15 @@ class Config:
     LOG_TEST_PATH = OUTPUT_PATH + 'test.log'
 
     # Data preprocessing parameters
-    NUMERIC_COLUMNS = ['price', 'size', 'remaining_size', 'remaining_size_change']
-    CATEGORICAL_COLUMNS = ['type', 'side', 'reason']
-    CATEGORICAL_MAP = {
+    FULL_CHANNEL_NUMERIC_COLUMNS = ['price', 'size', 'remaining_size', 'remaining_size_change']
+    FULL_CHANNEL_CATEGORICAL_COLUMNS = ['type', 'side', 'reason']
+    FULL_CHANNEL_CATEGORICAL_MAP = {
             'type': ['change', 'done', 'match', 'open', 'received'],
             'side': ['buy', 'sell'],
             'reason': ['canceled', 'filled', 'missing']
         }
+    TICKER_SIDE_CATEGORIES = ['buy', 'sell']
+    TICKER_NUMERIC_COLUMNS = ['price', 'open_24h', 'volume_24h', 'high_24h', 'volume_30d', 'best_bid', 'best_ask', 'last_size']
 
     # Feature engineering parameters
     ROLLING_WINDOWS = [5, 10, 15]

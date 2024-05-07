@@ -59,7 +59,7 @@ def create_categorical_transformer():
         Pipeline: A configured pipeline for categorical feature transformations.
     """
     try:
-        categories = Config.CATEGORICAL_MAP
+        categories = Config.FULL_CHANNEL_CATEGORICAL_MAP
         transformers = [(key, Pipeline([
             ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
             ('onehot', OneHotEncoder(categories=[categories[key]], handle_unknown='ignore'))
@@ -120,8 +120,8 @@ def preprocess_full_channel_data(data):
         data['remaining_size_change'] = data.groupby('order_id')['remaining_size'].diff().fillna(0)
 
         preprocessor = ColumnTransformer([
-            ('num', create_numeric_transformer(), Config.NUMERIC_COLUMNS),
-            ('cat', create_categorical_transformer(), Config.CATEGORICAL_COLUMNS)
+            ('num', create_numeric_transformer(), Config.FULL_CHANNEL_NUMERIC_COLUMNS),
+            ('cat', create_categorical_transformer(), Config.FULL_CHANNEL_CATEGORICAL_COLUMNS)
         ], remainder='drop')
 
         data_transformed = preprocessor.fit_transform(data)
@@ -154,10 +154,11 @@ def preprocess_ticker_data(data):
             return None
         data.drop(columns=['type', 'product_id', 'time', 'low_24h'], inplace=True)
 
-        numeric_cols = ['price', 'open_24h', 'volume_24h', 'high_24h', 'volume_30d', 'best_bid', 'best_ask', 'last_size']
-        data[numeric_cols] = MinMaxScaler().fit_transform(data[numeric_cols])
+        data[Config.TICKER_NUMERIC_COLUMNS] = MinMaxScaler().fit_transform(data[Config.TICKER_NUMERIC_COLUMNS])
+        for category in Config.TICKER_SIDE_CATEGORIES:
+            data[f'side_{category}'] = (data['side'] == category).astype(int)
+        data.drop(columns=['side'], inplace=True)
 
-        data = pd.get_dummies(data, columns=['side'], drop_first=False)
         return data
     except KeyError as e:
         logger.error(f"Error: A required column is missing. {e}")

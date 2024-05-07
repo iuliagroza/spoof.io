@@ -55,9 +55,9 @@ async def simulate_market_data():
             await asyncio.sleep(full_channel_row['delay'])
             await asyncio.sleep(ticker_row['delay'])
 
-            # Append to batch
-            full_channel_batch.append(full_channel_row)
-            ticker_batch.append(ticker_row)
+            # Append to batch without the 'delay' column
+            full_channel_batch.append(full_channel_row.drop('delay'))
+            ticker_batch.append(ticker_row.drop('delay'))
 
             # If batch is ready, process it
             if len(full_channel_batch) == Config.BATCH_SIZE:
@@ -69,9 +69,6 @@ async def simulate_market_data():
                 processed_ticker = preprocess_ticker_data(ticker_df)
                 enhanced_full_channel = extract_full_channel_features(processed_full_channel)
                 enhanced_ticker = extract_ticker_features(processed_ticker)
-
-                print(enhanced_full_channel.head())
-                print(enhanced_ticker.head())
 
                 save_data(enhanced_full_channel, enhanced_ticker, Config.MISC_DATA_PATH + 'full_channel_output.csv', Config.MISC_DATA_PATH + 'ticker_output.csv')
 
