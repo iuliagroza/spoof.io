@@ -1,0 +1,20 @@
+.Hero {
+    background-color: #0b0f19;
+    color: #ffffff;
+    text-align: center;
+
+    .Hero-content {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .Hero-title {
+        font-size: 2.5rem;
+        margin-bottom: 0.5em;
+    }
+
+    .Hero-description {
+        font-size: 1.2rem;
+        line-height: 1.6;
+    }
+}

@@ -1,10 +1,13 @@
 import React from 'react';
-import './App.css';
+import './App.scss';
+import Hero from './components/Hero/Hero';
+import Navbar from './components/Navbar/Navbar';
 
-function App(): JSX.Element {
+const App: React.FC = () => {
   return (
-    <div>
-      <h1>Hello, world!</h1>
+    <div className="App">
+      <Navbar />
+      <Hero />
     </div>
   );
 }
