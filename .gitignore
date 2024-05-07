@@ -1,7 +1,8 @@
 .DS_Store
 spoof
 __pycache__
-data/misc
+data/misc/
+webapp/frontend/build
 
 # React
 # dependencies
