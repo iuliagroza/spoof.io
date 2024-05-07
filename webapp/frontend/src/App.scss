@@ -46,3 +46,9 @@ body {
     transform: rotate(360deg);
   }
 }
+
+.app-container {
+  display: flex;
+  flex-direction: row;
+  margin: 2%;
+}

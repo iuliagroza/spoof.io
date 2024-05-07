@@ -1,0 +1,24 @@
+.orders-box {
+    background-color: #1f2937;
+    height: 100vh;
+    overflow-y: auto;
+    border-radius: 5px;
+    min-width: 48%;
+    max-height: 700px;
+    margin: 0 1%;
+}
+
+.orders-box h2 {
+    color: #ffffff;
+}
+
+.orders-box ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.orders-box li {
+    margin: 10px 0;
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+}

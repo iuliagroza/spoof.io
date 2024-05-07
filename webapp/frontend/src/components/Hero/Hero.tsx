@@ -7,7 +7,7 @@ const Hero: React.FC = () => {
             <div className="Hero-content">
                 <h1 className="Hero-title">Secure Your LUNA Transactions Against Spoofing</h1>
                 <p className="Hero-description">
-                    Protect yourself from market manipulations with real-time monitoring and advanced spoofing detection algorithms.
+                    Protect yourself from market manipulations with real-time monitoring of spoofing & layering attempts on LUNA.
                 </p>
             </div>
         </div>
