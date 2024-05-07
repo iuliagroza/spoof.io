@@ -12,6 +12,7 @@ node_modules
 package-lock.json
 package.json
 manifest.json
+tsconfig.json
 
 # testing
 /coverage
