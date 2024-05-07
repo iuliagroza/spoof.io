@@ -1,8 +1,5 @@
 import pandas as pd
-import numpy as np
 import asyncio
-from datetime import datetime
-from django.utils.timezone import make_aware
 from src.config import Config
 from src.preprocess_data import preprocess_full_channel_data, preprocess_ticker_data
 from src.extract_features import extract_full_channel_features, extract_ticker_features
