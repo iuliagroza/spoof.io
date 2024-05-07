@@ -126,9 +126,8 @@ def preprocess_full_channel_data(data):
         if data is None:
             return None
 
-        # Convert categorical columns to string to ensure type safety
-        for col in Config.FULL_CHANNEL_CATEGORICAL_COLUMNS:
-            data[col] = data[col].astype(str)
+        if 'size' not in data.columns or data['size'].isna().all():
+            data['size'] = 0
 
         data.fillna({'remaining_size': 0, 'price': data['price'].mean()}, inplace=True)
         data['remaining_size_change'] = data.groupby('order_id')['remaining_size'].diff().fillna(0)
@@ -150,6 +149,7 @@ def preprocess_full_channel_data(data):
     except Exception as e:
         logger.error(f"An error occurred while preprocessing full channel data. {e}")
         return None
+
 
 
 def preprocess_ticker_data(data):
