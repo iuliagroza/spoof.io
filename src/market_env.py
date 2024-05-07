@@ -13,17 +13,20 @@ class MarketEnvironment:
     Represents a market environment for reinforcement learning, handling time-series data for financial trading simulations.
     """
 
-    def __init__(self, initial_index=0, train=True):
+    def __init__(self, initial_index=0, full_channel_data=None, ticker_data=None, train=True):
         """
         Initializes the MarketEnvironment with data loaded from specified paths in the configuration.
 
         Args:
             initial_index (int): The starting index for data to simulate the environment's time step.
-            train (bool): Flag to determine if the environment is for training or testing, influencing data segmentation.
+            full_channel_data (pd.DataFrame): DataFrame containing needed full channel data. None by default.
+            ticker_data (pd.DataFrame): DataFrame containing needed ticker data. None by default.
+            train (bool): Flag to determine if the environment is for training or testing, influencing data segmentation. True by default.
         """
         try:
-            self.full_channel_data, self.ticker_data = load_csv_data(Config.FULL_CHANNEL_ENHANCED_PATH, Config.TICKER_ENHANCED_PATH)
-            self.split_data(train)
+            if full_channel_data is None and ticker_data is None:
+                self.full_channel_data, self.ticker_data = load_csv_data(Config.FULL_CHANNEL_ENHANCED_PATH, Config.TICKER_ENHANCED_PATH)
+                self.split_data(train)
         except Exception as e:
             logger.error(f"Failed to load data with error: {e}")
             raise Exception(f"Data loading failed: {e}")

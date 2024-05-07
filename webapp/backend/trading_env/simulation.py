@@ -1,22 +1,12 @@
 import pandas as pd
 import asyncio
-from torch.distributions import Categorical
-import torch
 from src.utils.log_config import Config
 from src.preprocess_data import preprocess_full_channel_data, preprocess_ticker_data
 from src.extract_features import extract_full_channel_features, extract_ticker_features
-from market_env import MarketEnvironment
-from src.ppo_policy_network import PPOPolicyNetwork
+from src.market_env import MarketEnvironment
+from src.test import load_model, test_model
 
 async def simulate_market_data():
-    # Load and prepare the model
-    model = PPOPolicyNetwork(num_features=Config.NUM_FEATURES, num_actions=Config.NUM_ACTIONS)
-    model.load_state_dict(torch.load(Config.MODEL_PATH))
-    model.eval()
-
-    # Initialize the market environment
-    env = MarketEnvironment()
-
     # Load the data
     full_channel_data = pd.read_csv(Config.FULL_CHANNEL_SIM_PATH)
     ticker_data = pd.read_csv(Config.TICKER_SIM_PATH)
@@ -36,8 +26,6 @@ async def simulate_market_data():
     # Start processing each row as a 'real-time' feed
     full_channel_iter = full_channel_data.iterrows()
     ticker_iter = ticker_data.iterrows()
-    full_channel_prev_time = None
-    ticker_prev_time = None
 
     try:
         while True:
@@ -64,31 +52,15 @@ async def simulate_market_data():
                 enhanced_full_channel = extract_full_channel_features(processed_full_channel)
                 enhanced_ticker = extract_ticker_features(processed_ticker)
 
-                # Load data into the environment and reset for the new batch
-                env.load_data(enhanced_full_channel, enhanced_ticker)
-                state = env.reset()
+                env = MarketEnvironment(initial_index=0, full_channel_data=enhanced_full_channel, ticker_data=enhanced_ticker, train=False)
+                model = load_model(Config.PPO_POLICY_NETWORK_MODEL_PATH, len(env.reset()), 2)
+                data = test_model(env, model)
 
-                # Simulation loop for the current batch
-                while not env.done:
-                    state_tensor = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
-                    with torch.no_grad():
-                        logits = model(state_tensor)
-                        dist = Categorical(logits=logits)
-                        action = dist.sample().item()
-
-                    # Take action
-                    state, reward, done, anomaly_score, spoofing_threshold = env.step(action)
-
-                    # Optionally, log or print the result
-                    print(f"Action: {action}, Reward: {reward}, Anomaly Score: {anomaly_score}, Spoofing Threshold: {spoofing_threshold}")
+                print(data)
 
                 # Reset batches
                 full_channel_batch = []
                 ticker_batch = []
-
-            # Update previous time for reference if needed
-            full_channel_prev_time = full_channel_row['time']
-            ticker_prev_time = ticker_row['time']
 
     except StopIteration:
         pass  # End of data
