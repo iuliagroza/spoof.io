@@ -92,17 +92,22 @@ def market_spread(data):
 
 def encode_hour_of_day(data):
     """
-    One-hot encode the 'hour_of_day' column.
+    One-hot encode the 'hour_of_day' column with predefined categories to ensure consistency.
     
     Args:
         data (pd.DataFrame): The dataset for which the hour of day will be encoded.
     
     Returns:
-        data (pd.DataFrame): The dataset with encoded hour of day.
+        data (pd.DataFrame): The dataset with encoded hour of day, including all predefined categories.
     """
     try:
-        encoded_hours = pd.get_dummies(data['hour_of_day'], prefix='hour')
-        data = pd.concat([data, encoded_hours], axis=1)
+        for hour in Config.HOURS:
+            data[hour] = 0
+
+        for index, row in data.iterrows():
+            hour_column = f'hour_{int(row["hour_of_day"])}'
+            if hour_column in data.columns:
+                data.at[index, hour_column] = 1
     except Exception as e:
         logger.error(f"Error encoding hour of day: {e}")
     return data

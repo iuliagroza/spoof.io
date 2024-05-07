@@ -48,12 +48,18 @@ class Config:
     LOG_TEST_PATH = OUTPUT_PATH + 'test.log'
 
     # Data preprocessing parameters
-    CATEGORICAL_COLUMNS = ['type', 'side', 'reason']
     NUMERIC_COLUMNS = ['price', 'size', 'remaining_size', 'remaining_size_change']
+    CATEGORICAL_COLUMNS = ['type', 'side', 'reason']
+    CATEGORICAL_MAP = {
+            'type': ['change', 'done', 'match', 'open', 'received'],
+            'side': ['buy', 'sell'],
+            'reason': ['canceled', 'filled', 'missing']
+        }
 
     # Feature engineering parameters
     ROLLING_WINDOWS = [5, 10, 15]
     OPERATIONS = ['mean', 'std', 'var']
+    HOURS = ['hour_' + str(x) for x in range(15, 20)]
 
     # Environment simulation parameters
     DEFAULT_SPOOFING_THRESHOLD = 0.8  # Default spoofing threshold for normal runs

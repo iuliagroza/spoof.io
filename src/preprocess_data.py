@@ -59,13 +59,47 @@ def create_categorical_transformer():
         Pipeline: A configured pipeline for categorical feature transformations.
     """
     try:
-        return Pipeline(steps=[
+        categories = Config.CATEGORICAL_MAP
+        transformers = [(key, Pipeline([
             ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
-            ('onehot', OneHotEncoder(handle_unknown='ignore'))
-        ])
+            ('onehot', OneHotEncoder(categories=[categories[key]], handle_unknown='ignore'))
+        ]), [key]) for key in categories.keys()]
+        return ColumnTransformer(transformers)
     except Exception as e:
         logger.error(f"An error occurred while creating the categorical transformer. {e}")
         return None
+
+
+def get_feature_names(column_transformer):
+    """
+    Generate feature names from the column transformer. This function specifically handles extracting feature names
+    from transformers within a ColumnTransformer, ensuring all transformations including those from OneHotEncoder
+    result in appropriately named features.
+
+    Args:
+        column_transformer (ColumnTransformer): The ColumnTransformer instance from which to extract feature names.
+
+    Returns:
+        List[str]: A list containing all feature names derived from the transformers within the ColumnTransformer.
+    """
+    feature_names = []
+    for transformer_name, transformer, original_features in column_transformer.transformers_[:-1]:  # Ignore the remainder transformer
+        if transformer_name == 'drop':
+            continue
+
+        if hasattr(transformer, 'get_feature_names_out'):
+            if isinstance(transformer, Pipeline):
+                # If pipeline, the last step is usually the one with get_feature_names_out
+                transformer = transformer.steps[-1][1]
+            names = transformer.get_feature_names_out(original_features)
+        else:
+            # If no get_feature_names_out, use the original feature name
+            names = original_features
+
+        processed_names = [name.split('__')[-1] for name in names]
+        feature_names.extend(processed_names)
+
+    return feature_names
 
 
 def preprocess_full_channel_data(data):
@@ -85,17 +119,15 @@ def preprocess_full_channel_data(data):
         data.fillna({'remaining_size': 0, 'price': data['price'].mean()}, inplace=True)
         data['remaining_size_change'] = data.groupby('order_id')['remaining_size'].diff().fillna(0)
 
-        numeric_features = Config.NUMERIC_COLUMNS
-        categorical_features = Config.CATEGORICAL_COLUMNS
+        preprocessor = ColumnTransformer([
+            ('num', create_numeric_transformer(), Config.NUMERIC_COLUMNS),
+            ('cat', create_categorical_transformer(), Config.CATEGORICAL_COLUMNS)
+        ], remainder='drop')
 
-        preprocessor = ColumnTransformer(transformers=[
-            ('num', create_numeric_transformer(), numeric_features),
-            ('cat', create_categorical_transformer(), categorical_features)
-        ])
-
-        data_processed = pd.DataFrame(preprocessor.fit_transform(data))
-        data_processed.columns = numeric_features + list(preprocessor.named_transformers_['cat'].named_steps['onehot'].get_feature_names_out(categorical_features))
-        data_processed['hour_of_day'] = data['hour_of_day'].values
+        data_transformed = preprocessor.fit_transform(data)
+        feature_names = get_feature_names(preprocessor)
+        data_processed = pd.DataFrame(data_transformed, columns=feature_names, index=data.index)
+        data_processed['hour_of_day'] = data['hour_of_day']
 
         return data_processed
     except KeyError as e:
