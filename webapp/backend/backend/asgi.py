@@ -13,7 +13,7 @@ from django.core.asgi import get_asgi_application
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.urls import path
-from trading_env.consumers import MarketDataConsumer
+from trading_env.consumers import TradingConsumer
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
 
@@ -21,7 +21,7 @@ application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": AuthMiddlewareStack(
         URLRouter([
-            path("ws/marketdata/", MarketDataConsumer.as_asgi()),
+            path("ws/orders/", TradingConsumer.as_asgi()),
         ])
     ),
 })
