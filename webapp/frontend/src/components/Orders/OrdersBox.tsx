@@ -14,7 +14,6 @@ const OrdersBox: React.FC = () => {
                         <th>Type</th>
                         <th>Size</th>
                         <th>Price</th>
-                        <th>Status</th>
                         <th>Time</th>
                         <th>Reason</th>
                         <th>Remaining Size</th>
@@ -28,7 +27,6 @@ const OrdersBox: React.FC = () => {
                             <td>{order.type}</td>
                             <td>{order.size}</td>
                             <td>{order.price}</td>
-                            <td>{order.status}</td>
                             <td>{order.time}</td>
                             <td>{order.reason}</td>
                             <td>{order.remaining_size}</td>

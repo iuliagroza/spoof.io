@@ -15,16 +15,18 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     const [orders, setOrders] = useState<Order[]>([]);
 
     useEffect(() => {
-        const ws = new WebSocket('ws://localhost:8000/ws/test/');
+        const ws = new WebSocket('ws://localhost:8000/ws/orders/');
 
         ws.onopen = () => {
             console.log('WebSocket Connected');
         };
 
         ws.onmessage = (event) => {
+            console.log("Received message:", event.data);  // Log raw data to console
             try {
                 const order: Order = JSON.parse(event.data);
-                setOrders(prevOrders => [...prevOrders, order]);
+                console.log("Parsed order:", order);  // Log the parsed data to console
+                setOrders(prevOrders => [...prevOrders, order]);  // Update state with the new order
             } catch (error) {
                 console.error('Failed to parse order from WebSocket message:', error);
             }
@@ -39,7 +41,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
         };
 
         return () => {
-            if (ws.readyState == 1) {
+            if (ws.readyState === WebSocket.OPEN) {
                 console.log('Closing WebSocket');
                 ws.close();
             }

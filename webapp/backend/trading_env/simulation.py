@@ -1,4 +1,6 @@
-import time
+import asyncio
+from datetime import datetime
+import json
 from channels.layers import get_channel_layer
 import pandas as pd
 from trading_env.config import Config
@@ -9,13 +11,22 @@ from trading_env.test import load_model, test_model
 from trading_env.utils.save_data import save_data
 
 
-def send_order(order):
+async def send_order(order):
     channel_layer = get_channel_layer()
-    channel_layer.group_send(
+    # Convert DataFrame to a dictionary, replacing NaN with None
+    order = {k: (None if pd.isna(v) else v) for k, v in order.to_dict().items()}
+    
+    # Convert Timestamp or datetime objects to string
+    for key, value in order.items():
+        if isinstance(value, (pd.Timestamp, datetime)):
+            # ISO format is a good choice as it's standard and includes the timezone
+            order[key] = value.isoformat()
+
+    await channel_layer.group_send(
         'order_group',
         {
             'type': 'order.message',
-            'message': order
+            'message': json.dumps(order)  # Serialize the dictionary to a JSON formatted string
         }
     )
 
@@ -36,7 +47,7 @@ def print_spoofing_attempts(data):
         print("No spoofing attempts detected in this batch.")
 
 
-def simulate_market_data():
+async def simulate_market_data():
     # Load the data
     full_channel_data = pd.read_csv(Config.FULL_CHANNEL_SIM_PATH)
     ticker_data = pd.read_csv(Config.TICKER_SIM_PATH)
@@ -64,8 +75,8 @@ def simulate_market_data():
             _, ticker_row = next(ticker_iter)
 
             # Sleep to simulate real-time data feed
-            time.sleep(full_channel_row['delay'])
-            time.sleep(ticker_row['delay'])
+            await asyncio.sleep(full_channel_row['delay'])
+            await asyncio.sleep(ticker_row['delay'])
 
             # Append to batch without the 'delay' column
             full_channel_row_without_delay = full_channel_row.drop('delay')
@@ -74,7 +85,7 @@ def simulate_market_data():
             ticker_batch.append(ticker_row_without_delay)
 
             # Send simulated order to frontend order box
-            send_order(full_channel_row_without_delay.to_dict())
+            await send_order(full_channel_row.drop('delay'))
 
             # If batch is ready, process it
             if len(full_channel_batch) == Config.BATCH_SIZE:

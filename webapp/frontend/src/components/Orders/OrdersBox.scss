@@ -3,10 +3,12 @@
     height: 100vh;
     overflow-y: auto;
     border-radius: 5px;
-    min-width: 48%;
+    width: 48%;
     max-height: 725px;
     margin: 0 1%;
     border: .5px solid #ccc;
+    display: flex;
+    flex-direction: column-reverse;
 
     table {
         width: 100%;
@@ -23,6 +25,11 @@
         th {
             background-color: #0b0f19;
             color: white;
+            position: sticky;
+            top: 0;
+            /* Stick to the top of the table */
+            z-index: 2;
+            /* Ensures the header is above other content */
         }
     }
 }
