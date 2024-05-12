@@ -1,11 +1,23 @@
+import time
+from channels.layers import get_channel_layer
 import pandas as pd
-import asyncio
-from src.config import Config
-from src.preprocess_data import preprocess_full_channel_data, preprocess_ticker_data
-from src.extract_features import extract_full_channel_features, extract_ticker_features
-from src.market_env import MarketEnvironment
-from src.test import load_model, test_model
-from src.utils.save_data import save_data
+from trading_env.config import Config
+from trading_env.preprocess_data import preprocess_full_channel_data, preprocess_ticker_data
+from trading_env.extract_features import extract_full_channel_features, extract_ticker_features
+from trading_env.market_env import MarketEnvironment
+from trading_env.test import load_model, test_model
+from trading_env.utils.save_data import save_data
+
+
+def send_order(order):
+    channel_layer = get_channel_layer()
+    channel_layer.group_send(
+        'order_group',
+        {
+            'type': 'order.message',
+            'message': order
+        }
+    )
 
 
 def print_spoofing_attempts(data):
@@ -15,8 +27,8 @@ def print_spoofing_attempts(data):
     # Check if there are any spoofing attempts
     if not spoofing_attempts.empty:
         print("Detected Spoofing Attempts:")
-        for index, row in spoofing_attempts.iterrows():
-            print(f"Order ID: {index}")
+        # for index, row in spoofing_attempts.iterrows():
+            # print(f"Order ID: {index}")
             # print(f"Features (States): {row['states']}")
             # print(f"Anomaly Score: {row['anomaly_scores']}")
             # print(f"Threshold: {row['spoofing_thresholds']}\n")
@@ -24,7 +36,7 @@ def print_spoofing_attempts(data):
         print("No spoofing attempts detected in this batch.")
 
 
-async def simulate_market_data():
+def simulate_market_data():
     # Load the data
     full_channel_data = pd.read_csv(Config.FULL_CHANNEL_SIM_PATH)
     ticker_data = pd.read_csv(Config.TICKER_SIM_PATH)
@@ -52,12 +64,17 @@ async def simulate_market_data():
             _, ticker_row = next(ticker_iter)
 
             # Sleep to simulate real-time data feed
-            await asyncio.sleep(full_channel_row['delay'])
-            await asyncio.sleep(ticker_row['delay'])
+            time.sleep(full_channel_row['delay'])
+            time.sleep(ticker_row['delay'])
 
             # Append to batch without the 'delay' column
-            full_channel_batch.append(full_channel_row.drop('delay'))
-            ticker_batch.append(ticker_row.drop('delay'))
+            full_channel_row_without_delay = full_channel_row.drop('delay')
+            ticker_row_without_delay = ticker_row.drop('delay')
+            full_channel_batch.append(full_channel_row_without_delay)
+            ticker_batch.append(ticker_row_without_delay)
+
+            # Send simulated order to frontend order box
+            send_order(full_channel_row_without_delay.to_dict())
 
             # If batch is ready, process it
             if len(full_channel_batch) == Config.BATCH_SIZE:
@@ -89,8 +106,9 @@ async def simulate_market_data():
     except Exception as e:
         print(f"An error occurred: {e}")
 
+
 def start_simulation():
-    asyncio.run(simulate_market_data())
+    simulate_market_data()
 
 if __name__ == "__main__":
     start_simulation()

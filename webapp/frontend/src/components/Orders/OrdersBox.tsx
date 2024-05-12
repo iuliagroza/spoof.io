@@ -1,12 +1,10 @@
 import React from 'react';
 import './OrdersBox.scss';
-import { Order } from '../../types/order';
+import { useWebSocket } from '../../WebSocketContext';
 
-interface OrdersBoxProps {
-    orders: Order[];
-}
+const OrdersBox: React.FC = () => {
+    const { orders } = useWebSocket();
 
-const OrdersBox: React.FC<OrdersBoxProps> = ({ orders }) => {
     return (
         <div className="orders-box">
             <table>
@@ -18,17 +16,23 @@ const OrdersBox: React.FC<OrdersBoxProps> = ({ orders }) => {
                         <th>Price</th>
                         <th>Status</th>
                         <th>Time</th>
+                        <th>Reason</th>
+                        <th>Remaining Size</th>
+                        <th>Trade ID</th>
                     </tr>
                 </thead>
                 <tbody>
                     {orders.map(order => (
-                        <tr key={order.id}>
-                            <td>{order.id}</td>
+                        <tr key={order.order_id}>
+                            <td>{order.order_id}</td>
                             <td>{order.type}</td>
                             <td>{order.size}</td>
                             <td>{order.price}</td>
                             <td>{order.status}</td>
                             <td>{order.time}</td>
+                            <td>{order.reason}</td>
+                            <td>{order.remaining_size}</td>
+                            <td>{order.trade_id}</td>
                         </tr>
                     ))}
                 </tbody>
