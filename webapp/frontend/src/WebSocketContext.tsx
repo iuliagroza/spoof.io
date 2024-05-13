@@ -2,7 +2,8 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { Order } from './types/order';  // Ensure this type is defined in your project according to your needs
 
 interface WebSocketContextType {
-    orders: Order[];
+    regularOrders: Order[];
+    spoofingOrders: Order[];
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -12,7 +13,8 @@ interface WebSocketProviderProps {
 }
 
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
-    const [orders, setOrders] = useState<Order[]>([]);
+    const [regularOrders, setRegularOrders] = useState<Order[]>([]);
+    const [spoofingOrders, setSpoofingOrders] = useState<Order[]>([]);
 
     useEffect(() => {
         const ws = new WebSocket('ws://localhost:8000/ws/orders/');
@@ -22,11 +24,15 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
         };
 
         ws.onmessage = (event) => {
-            console.log("Received message:", event.data);  // Log raw data to console
+            // console.log("Received message:", event.data);
             try {
-                const order: Order = JSON.parse(event.data);
-                console.log("Parsed order:", order);  // Log the parsed data to console
-                setOrders(prevOrders => [...prevOrders, order]);  // Update state with the new order
+                const data = JSON.parse(event.data);
+                if (data.is_spoofing) {
+                    console.log(data);
+                    setSpoofingOrders(prev => [...prev, data]);
+                } else {
+                    setRegularOrders(prev => [...prev, data]);
+                }
             } catch (error) {
                 console.error('Failed to parse order from WebSocket message:', error);
             }
@@ -49,7 +55,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     }, []);
 
     return (
-        <WebSocketContext.Provider value={{ orders }}>
+        <WebSocketContext.Provider value={{ regularOrders, spoofingOrders }}>
             {children}
         </WebSocketContext.Provider>
     );

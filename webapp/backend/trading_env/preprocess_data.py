@@ -122,6 +122,8 @@ def preprocess_full_channel_data(data):
         pd.DataFrame: The preprocessed DataFrame ready for model consumption.
     """
     try:
+        identifiers = data[['order_id', 'time']].copy()
+
         data = add_time_features(data)
         if data is None:
             return None
@@ -145,6 +147,7 @@ def preprocess_full_channel_data(data):
         feature_names = get_feature_names(preprocessor)
         data_processed = pd.DataFrame(data_transformed, columns=feature_names, index=data.index)
         data_processed['hour_of_day'] = data['hour_of_day']
+        data_processed = pd.concat([identifiers.reset_index(drop=True), data_processed.reset_index(drop=True)], axis=1)
 
         return data_processed
     except KeyError as e:

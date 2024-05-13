@@ -1,3 +1,5 @@
+import torch
+from torch.distributions import Categorical
 import asyncio
 from datetime import datetime
 import json
@@ -7,44 +9,112 @@ from trading_env.config import Config
 from trading_env.preprocess_data import preprocess_full_channel_data, preprocess_ticker_data
 from trading_env.extract_features import extract_full_channel_features, extract_ticker_features
 from trading_env.market_env import MarketEnvironment
-from trading_env.test import load_model, test_model
+from trading_env.ppo_policy_network import PPOPolicyNetwork
 from trading_env.utils.save_data import save_data
+from trading_env.utils.log_config import setup_logger
 
 
-async def send_order(order):
+logger = setup_logger('test', Config.LOG_TEST_PATH)
+
+
+async def send_order(order, is_spoof=False):
     channel_layer = get_channel_layer()
-    # Convert DataFrame to a dictionary, replacing NaN with None
-    order = {k: (None if pd.isna(v) else v) for k, v in order.to_dict().items()}
-    
-    # Convert Timestamp or datetime objects to string
-    for key, value in order.items():
+
+    if not isinstance(order, dict):
+        if hasattr(order, 'to_dict'):
+            order_dict = order.to_dict()
+        else:
+            raise TypeError("Order data must be a dictionary or convertible to a dictionary.")
+    else:
+        order_dict = order
+
+    order_dict = {k: (None if pd.isna(v) else v) for k, v in order_dict.items()}
+
+    for key, value in order_dict.items():
         if isinstance(value, (pd.Timestamp, datetime)):
-            # ISO format is a good choice as it's standard and includes the timezone
-            order[key] = value.isoformat()
+            order_dict[key] = value.isoformat()
+
+    if is_spoof:
+        order_dict.update({
+            'is_spoofing': True,
+            'anomaly_score': order['anomaly_score'],
+            'spoofing_threshold': order['spoofing_threshold']
+        })
 
     await channel_layer.group_send(
         'order_group',
         {
             'type': 'order.message',
-            'message': json.dumps(order)  # Serialize the dictionary to a JSON formatted string
+            'message': json.dumps(order_dict)
         }
     )
 
 
-def print_spoofing_attempts(data):
-    # Filter for spoofing attempts where action == 1
-    spoofing_attempts = data[data['actions'] == 1]
+def load_model(model_path, num_features, num_actions):
+    """
+    Load the trained PPO policy network model from a given file path.
 
-    # Check if there are any spoofing attempts
-    if not spoofing_attempts.empty:
-        print("Detected Spoofing Attempts:")
-        # for index, row in spoofing_attempts.iterrows():
-            # print(f"Order ID: {index}")
-            # print(f"Features (States): {row['states']}")
-            # print(f"Anomaly Score: {row['anomaly_scores']}")
-            # print(f"Threshold: {row['spoofing_thresholds']}\n")
-    else:
-        print("No spoofing attempts detected in this batch.")
+    Args:
+        model_path (str): The file path where the model is saved.
+        num_features (int): Number of input features for the model.
+        num_actions (int): Number of actions the model can take.
+
+    Returns:
+        PPOPolicyNetwork: The loaded and trained policy network ready for inference.
+    """
+    model = PPOPolicyNetwork(num_features, num_actions)
+    model.load_state_dict(torch.load(model_path))
+    model.eval()
+    return model
+
+
+async def test_model(env, model):
+    """
+    Test the model by simulating its interaction with the environment and log results.
+
+    Args:
+        env (MarketEnvironment): An instance of the market environment to test the model on.
+        model (PPOPolicyNetwork): The trained PPO model to be tested.
+
+    This function runs a simulation in the environment using the trained model. It logs
+    each step's action, reward, anomaly score, and spoofing threshold. It also logs the
+    total reward accumulated over all steps at the end of the test.
+    """
+    try:
+        states = []
+        actions = []
+        rewards = []
+        anomaly_scores = []
+        spoofing_thresholds = []
+
+        state = env.reset()
+        total_reward = 0
+        steps = 0
+
+        while not env.done:
+            state = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
+            with torch.no_grad():
+                logits = model(state)
+                dist = Categorical(logits=logits)
+                action = dist.sample()
+
+            state, transaction_data, reward, done, anomaly_score, spoofing_threshold = env.step(action.item())
+            if transaction_data is not None and 'order_id' in transaction_data and action.item() == 1:
+                transaction_data.update({'anomaly_score': anomaly_score, 'spoofing_threshold': spoofing_threshold})
+                await send_order(transaction_data, is_spoof=True)
+
+            states.append(state)
+            actions.append(action.item())
+            rewards.append(reward)
+            anomaly_scores.append(anomaly_score)
+            spoofing_thresholds.append(spoofing_threshold)
+            total_reward += reward
+            steps += 1
+            logger.info(f"Step: {steps}, Action: {action.item()}, Reward: {reward}, Anomaly Score: {anomaly_score}, Spoofing Threshold: {spoofing_threshold}")
+
+        logger.info(f"Test completed. Total Reward: {total_reward}, Total Steps: {steps}")
+    except Exception as e:
+        logger.error(f"An error occurred during the test: {e}")
 
 
 async def simulate_market_data():
@@ -104,8 +174,7 @@ async def simulate_market_data():
 
                 env = MarketEnvironment(initial_index=0, full_channel_data=enhanced_full_channel, ticker_data=enhanced_ticker, train=False)
                 model = load_model(Config.PPO_POLICY_NETWORK_MODEL_PATH, len(env.reset()), 2)
-                data = test_model(env, model)
-                print_spoofing_attempts(data)
+                await test_model(env, model)
 
                 # Reset batches
                 full_channel_batch = []

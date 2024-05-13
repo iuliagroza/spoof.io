@@ -84,35 +84,40 @@ class MarketEnvironment:
         # Terminal state reached: neutral outcome (reward "zero")
         if self.current_index >= len(self.full_channel_data) or self.current_index >= len(self.ticker_data):
             self.done = True
-            return None, 0, True, 0, self.spoofing_threshold
+            return None, None, 0, True, 0, self.spoofing_threshold
 
         try:
+            transaction_data = self.full_channel_data.iloc[self.current_index].to_dict()
             anomaly_score = self.calculate_anomaly_score(self.current_index)
             is_spoofing = anomaly_score > self.spoofing_threshold
             reward = 1 if (action == 1 and is_spoofing) or (action == 0 and not is_spoofing) else -1
 
             self.current_index += 1
             next_state = self.get_state() if not self.done else None
-            return next_state, reward, self.done, anomaly_score, self.spoofing_threshold
+            return next_state, transaction_data, reward, self.done, anomaly_score, self.spoofing_threshold
         except Exception as e:
             logger.error(f"An error occurred during the environment step: {e}")
             raise Exception(f"Step processing failed: {e}")
 
     def get_state(self):
         """
-        Generates the current state by concatenating historical features from both full channel and ticker datasets.
+        Generates the current state by concatenating historical features from both full channel and ticker datasets,
+        ensuring all data types are floats and non-numeric columns are excluded.
 
         Returns:
-            np.array: Concatenated array of historical market features, ensuring all data types are floats.
+            np.array: Concatenated array of historical market features.
         """
         try:
-            full_channel_features = self.full_channel_data.iloc[
-                self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index
-            ].astype(float).values.flatten()
+            numeric_cols_full = self.full_channel_data.select_dtypes(include=[np.number])
+            numeric_cols_ticker = self.ticker_data.select_dtypes(include=[np.number])
 
-            ticker_features = self.ticker_data.iloc[
+            full_channel_features = numeric_cols_full.iloc[
                 self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index
-            ].astype(float).values.flatten()
+            ].values.flatten()
+
+            ticker_features = numeric_cols_ticker.iloc[
+                self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index
+            ].values.flatten()
 
             return np.concatenate([full_channel_features, ticker_features])
         except Exception as e:

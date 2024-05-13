@@ -13,11 +13,13 @@ const App: React.FC = () => {
         <Navbar />
         <Hero />
         <div className="app-container">
-          <OrdersBox />
+          <OrdersBox type="regular" />
+          <OrdersBox type="spoofing" />
         </div>
       </div>
     </WebSocketProvider>
   );
 }
+
 
 export default App;
