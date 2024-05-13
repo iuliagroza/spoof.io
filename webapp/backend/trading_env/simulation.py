@@ -99,7 +99,8 @@ async def test_model(env, model):
                 action = dist.sample()
 
             state, transaction_data, reward, done, anomaly_score, spoofing_threshold = env.step(action.item())
-            if transaction_data is not None and 'order_id' in transaction_data and action.item() == 1:
+            logger.info(transaction_data)
+            if transaction_data is not None and not pd.isna(transaction_data['order_id'])  and action.item() == 1:
                 transaction_data.update({'anomaly_score': anomaly_score, 'spoofing_threshold': spoofing_threshold})
                 await send_order(transaction_data, is_spoof=True)
 
