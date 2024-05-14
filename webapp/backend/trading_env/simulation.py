@@ -10,7 +10,6 @@ from trading_env.preprocess_data import preprocess_full_channel_data, preprocess
 from trading_env.extract_features import extract_full_channel_features, extract_ticker_features
 from trading_env.market_env import MarketEnvironment
 from trading_env.ppo_policy_network import PPOPolicyNetwork
-from trading_env.utils.save_data import save_data
 from trading_env.utils.log_config import setup_logger
 
 
@@ -162,16 +161,12 @@ async def simulate_market_data():
             if len(full_channel_batch) == Config.BATCH_SIZE:
                 full_channel_df = pd.DataFrame(full_channel_batch)
                 ticker_df = pd.DataFrame(ticker_batch)
-                save_data(full_channel_df, ticker_df, Config.MISC_DATA_PATH + 'full_channel_df.csv', Config.MISC_DATA_PATH + 'ticker_df.csv')
 
                 # Preprocess and feature engineer
                 processed_full_channel = preprocess_full_channel_data(full_channel_df)
                 processed_ticker = preprocess_ticker_data(ticker_df)
-                save_data(processed_full_channel, processed_ticker, Config.MISC_DATA_PATH + 'full_channel_prep.csv', Config.MISC_DATA_PATH + 'ticker_prep.csv')
                 enhanced_full_channel = extract_full_channel_features(processed_full_channel)
                 enhanced_ticker = extract_ticker_features(processed_ticker)
-
-                save_data(enhanced_full_channel, enhanced_ticker, Config.MISC_DATA_PATH + 'full_channel_output.csv', Config.MISC_DATA_PATH + 'ticker_output.csv')
 
                 env = MarketEnvironment(initial_index=0, full_channel_data=enhanced_full_channel, ticker_data=enhanced_ticker, train=False)
                 model = load_model(Config.PPO_POLICY_NETWORK_MODEL_PATH, len(env.reset()), 2)
@@ -188,8 +183,5 @@ async def simulate_market_data():
         print(f"An error occurred: {e}")
 
 
-def start_simulation():
-    simulate_market_data()
-
 if __name__ == "__main__":
-    start_simulation()
+    simulate_market_data()
