@@ -13,7 +13,7 @@ const OrdersBox: React.FC<{ type: string }> = ({ type }) => {
                     <tr>
                         {type === "spoofing" ? (
                             <>
-                                <th>Order ID</th>
+                                <th>Detected Spoofed Order ID</th>
                                 <th>Time</th>
                                 <th>Anomaly Score</th>
                                 <th>Spoofing Threshold</th>
@@ -35,7 +35,7 @@ const OrdersBox: React.FC<{ type: string }> = ({ type }) => {
                 <tbody>
                     {orders.map((order, index) => (
                         <tr key={index}>
-                            <td>{order.order_id}</td>
+                            <td>{order.order_id ?? 'N/A'}</td>
                             {type === "spoofing" ? (
                                 <>
                                     <td>{order.time}</td>
