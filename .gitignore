@@ -3,6 +3,8 @@ spoof
 __pycache__
 data/misc/
 webapp/frontend/build
+eval/test_results.html
+webapp/frontend/public/test_results.html
 
 # React
 # dependencies
