@@ -11,6 +11,7 @@ from trading_env.extract_features import extract_full_channel_features, extract_
 from trading_env.market_env import MarketEnvironment
 from trading_env.ppo_policy_network import PPOPolicyNetwork
 from trading_env.utils.log_config import setup_logger
+from trading_env.utils.save_data import save_data
 
 
 logger = setup_logger('test', Config.LOG_TEST_PATH)
@@ -167,6 +168,7 @@ async def simulate_market_data():
                 processed_ticker = preprocess_ticker_data(ticker_df)
                 enhanced_full_channel = extract_full_channel_features(processed_full_channel)
                 enhanced_ticker = extract_ticker_features(processed_ticker)
+                save_data(enhanced_full_channel, enhanced_ticker, Config.MISC_DATA_PATH + 'full_channel_output.csv', Config.MISC_DATA_PATH + 'ticker_output.csv')
 
                 env = MarketEnvironment(initial_index=0, full_channel_data=enhanced_full_channel, ticker_data=enhanced_ticker, train=False)
                 model = load_model(Config.PPO_POLICY_NETWORK_MODEL_PATH, len(env.reset()), 2)
