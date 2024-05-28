@@ -1,2 +1,2 @@
 # spoof.io
-Detecting spoofing & layering in algorithmic trading using Proximal Policy Optimization (PPO).
+Spoofing & layering detection in algorithmic trading using Proximal Policy Optimization
