@@ -2,7 +2,7 @@
     background-color: #0b0f19;
     color: #ffffff;
     text-align: center;
-    height: 100px;
+    padding: 20px 0;
 
     .Hero-content {
         max-width: 1200px;
@@ -12,10 +12,18 @@
     .Hero-title {
         font-size: 2rem;
         margin-bottom: 0.5em;
+
+        @media (max-width: 768px) {
+            font-size: 1.5rem;
+        }
     }
 
     .Hero-description {
         font-size: 1.2rem;
         line-height: 1.6;
+
+        @media (max-width: 768px) {
+            font-size: 1rem;
+        }
     }
 }

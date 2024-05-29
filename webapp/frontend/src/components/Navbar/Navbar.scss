@@ -8,6 +8,10 @@
     display: flex;
     align-items: baseline;
     justify-content: flex-start;
+
+    @media (max-width: 768px) {
+        justify-content: center;
+    }
 }
 
 .navbar-logo {
@@ -16,10 +20,18 @@
     font-family: 'Kanit', sans-serif;
     margin-right: 4%;
     line-height: 0.4;
+
+    @media (max-width: 768px) {
+        margin-right: 0;
+    }
 }
 
 .navbar-links {
     display: flex;
+
+    @media (max-width: 768px) {
+        display: none;
+    }
 
     .navbar-link {
         color: #9aa3af;

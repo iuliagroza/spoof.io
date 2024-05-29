@@ -2,12 +2,17 @@ import React from 'react';
 import './OrdersBox.scss';
 import { useWebSocket } from '../../WebSocketContext';
 
-const OrdersBox: React.FC<{ type: string }> = ({ type }) => {
+interface OrdersBoxProps {
+    type: string;
+    className?: string;
+}
+
+const OrdersBox: React.FC<OrdersBoxProps> = ({ type, className }) => {
     const { regularOrders, spoofingOrders } = useWebSocket();
     const orders = type === "spoofing" ? spoofingOrders : regularOrders;
 
     return (
-        <div className="orders-box">
+        <div className={`orders-box ${className || ''}`}>
             <table>
                 <thead>
                     <tr>
@@ -39,8 +44,8 @@ const OrdersBox: React.FC<{ type: string }> = ({ type }) => {
                             {type === "spoofing" ? (
                                 <>
                                     <td>{order.time}</td>
-                                    <td>{order.anomaly_score}</td>
-                                    <td>{order.spoofing_threshold}</td>
+                                    <td>{((order.anomaly_score ?? 0) * 100).toFixed(2)}%</td>
+                                    <td>{((order.spoofing_threshold ?? 0) * 100).toFixed(2)}%</td>
                                 </>
                             ) : (
                                 <>

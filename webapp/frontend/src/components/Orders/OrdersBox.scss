@@ -10,6 +10,12 @@
     display: flex;
     flex-direction: column-reverse;
 
+    @media (max-width: 768px) {
+        width: 100%;
+        margin: 0;
+        max-height: none;
+    }
+
     table {
         width: 100%;
 

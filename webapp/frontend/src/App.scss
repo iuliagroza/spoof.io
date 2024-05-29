@@ -1,7 +1,6 @@
 $background-dark: #282c34;
 $primary-color: #61dafb;
-$font-base: 'Kanit', 'Segoe UI', 'Roboto', 'Oxygen',
-  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+$font-base: 'Kanit', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 
 body {
   margin: 0 auto;
@@ -51,4 +50,17 @@ body {
   display: flex;
   flex-direction: row;
   margin: 2%;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    .orders-box-regular {
+      display: none;
+    }
+
+    .orders-box-spoofing {
+      width: 100%;
+      margin: 0;
+    }
+  }
 }
