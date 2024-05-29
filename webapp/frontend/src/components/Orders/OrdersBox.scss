@@ -1,52 +1,45 @@
 .orders-box {
     background-color: #1f2937;
-    height: 100vh;
     overflow-y: auto;
     border-radius: 5px;
     width: 48%;
-    max-height: 667px;
     margin: 0 1%;
     border: .5px solid #ccc;
     display: flex;
     flex-direction: column-reverse;
+    height: calc(100vh - var(--navbar-height) - var(--hero-height) - 50px);
 
     @media (max-width: 768px) {
         width: 100%;
         margin: 0;
-        max-height: none;
+        height: auto; // Allow height to adjust naturally on smaller screens
     }
 
     table {
         width: 100%;
+        border-collapse: collapse;
+
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
 
         th,
         td {
             text-align: center;
             font-size: 0.9rem;
-        }
-
-        td {
-            border-top: .5px solid #ccc;
             height: 50px;
         }
 
         th {
             background-color: #0b0f19;
             color: white;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-            height: 50px;
+            border-bottom: .5px solid #ccc;
+        }
+
+        td {
+            border-top: .5px solid #ccc;
         }
     }
-}
-
-.orders-box ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.orders-box li {
-    margin: 10px 0;
-    padding: 5px;
 }

@@ -9,6 +9,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: #0b0f19;
   color: #fff;
+  overflow-x: hidden;
 }
 
 .App {
@@ -50,9 +51,12 @@ body {
   display: flex;
   flex-direction: row;
   margin: 2%;
+  height: calc(100vh - var(--navbar-height) - var(--hero-height));
+  overflow: hidden;
 
   @media (max-width: 768px) {
     flex-direction: column;
+    height: auto;
 
     .orders-box-regular {
       display: none;
@@ -61,6 +65,10 @@ body {
     .orders-box-spoofing {
       width: 100%;
       margin: 0;
+      overflow-y: auto;
+      /* Allow vertical overflow for the spoofing orders box */
+      height: calc(100vh - var(--navbar-height) - var(--hero-height));
+      /* Ensure it uses the available height */
     }
   }
 }

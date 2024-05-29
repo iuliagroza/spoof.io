@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import './Hero.scss';
 
-const Hero: React.FC = () => {
+const Hero: React.FC<{ setHeroHeight: (height: number) => void }> = ({ setHeroHeight }) => {
+    const heroRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (heroRef.current) {
+            setHeroHeight(heroRef.current.clientHeight);
+        }
+    }, [setHeroHeight]);
+
     return (
-        <div className="Hero">
+        <div className="Hero" ref={heroRef}>
             <div className="Hero-content">
                 <h1 className="Hero-title">Secure Your LUNA Transactions Against Spoofing</h1>
                 <p className="Hero-description">
