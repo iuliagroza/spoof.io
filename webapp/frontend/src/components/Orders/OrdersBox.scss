@@ -1,12 +1,11 @@
 .orders-box {
     background-color: #1f2937;
-    overflow-y: auto;
     border-radius: 5px;
     width: 48%;
     margin: 0 1%;
     border: .5px solid #ccc;
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     height: calc(100vh - var(--navbar-height) - var(--hero-height) - 50px);
 
     @media (max-width: 768px) {
@@ -15,15 +14,16 @@
         height: auto; // Allow height to adjust naturally on smaller screens
     }
 
+    .orders-body {
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column-reverse;
+        height: 100%;
+    }
+
     table {
         width: 100%;
         border-collapse: collapse;
-
-        thead {
-            position: sticky;
-            top: 0;
-            z-index: 2;
-        }
 
         th,
         td {
