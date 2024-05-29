@@ -24,12 +24,21 @@
     table {
         width: 100%;
         border-collapse: collapse;
+        table-layout: fixed;
+        /* Ensure the layout is consistent */
 
         th,
         td {
             text-align: center;
             font-size: 0.9rem;
             height: 50px;
+            padding: 8px;
+            white-space: nowrap;
+            /* Prevent text wrapping */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            /* Show ellipsis for overflowing text */
+            /* Add padding to ensure alignment */
         }
 
         th {

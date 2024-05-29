@@ -1,16 +1,21 @@
 .table-header {
-    background-color: #1f2937;
     width: 100%;
 
     table {
         width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        /* Ensure the layout is consistent */
 
         th {
-            background-color: #0b0f19;
-            color: white;
-            height: 50px;
             text-align: center;
             font-size: 0.9rem;
+            height: 50px;
+            padding: 8px;
+            /* Add padding to ensure alignment */
+            background-color: #0b0f19;
+            color: white;
+            border-bottom: .5px solid #ccc;
         }
     }
 }

@@ -26,7 +26,7 @@ const TableHeader: React.FC<TableHeaderProps> = ({ type }) => {
                                 <th>Price</th>
                                 <th>Time</th>
                                 <th>Reason</th>
-                                <th>Remaining Size</th>
+                                <th>Remaining<br />Size</th>
                                 <th>Trade ID</th>
                             </>
                         )}
