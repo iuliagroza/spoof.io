@@ -13,10 +13,10 @@ const TableHeader: React.FC<TableHeaderProps> = ({ type }) => {
                     <tr>
                         {type === "spoofing" ? (
                             <>
-                                <th>Detected Spoofed Order ID</th>
+                                <th>Detected Spoofed<br />Order ID</th>
                                 <th>Time</th>
-                                <th>Anomaly Score</th>
-                                <th>Spoofing Threshold</th>
+                                <th>Anomaly<br />Score</th>
+                                <th>Spoofing<br />Threshold</th>
                             </>
                         ) : (
                             <>

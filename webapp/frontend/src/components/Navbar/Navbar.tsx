@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import './Navbar.scss';
 
 const Navbar: React.FC<{ setNavbarHeight: (height: number) => void }> = ({ setNavbarHeight }) => {
@@ -15,9 +15,9 @@ const Navbar: React.FC<{ setNavbarHeight: (height: number) => void }> = ({ setNa
         <nav className="navbar" ref={navbarRef}>
             <h1 className="navbar-logo">spoof.io</h1>
             <div className="navbar-links">
-                <Link to="/" className="navbar-link">Detector</Link>
-                <Link to="/training-logs" className="navbar-link">Training Logs</Link>
-                <Link to="/hypertuning-logs" className="navbar-link">Hypertuning Logs</Link>
+                <NavLink to="/" className={({ isActive }) => isActive ? "navbar-link active-link" : "navbar-link"}>Detector</NavLink>
+                <NavLink to="/training-logs" className={({ isActive }) => isActive ? "navbar-link active-link" : "navbar-link"}>Training Logs</NavLink>
+                <NavLink to="/hypertuning-logs" className={({ isActive }) => isActive ? "navbar-link active-link" : "navbar-link"}>Hypertuning Logs</NavLink>
             </div>
         </nav>
     );
