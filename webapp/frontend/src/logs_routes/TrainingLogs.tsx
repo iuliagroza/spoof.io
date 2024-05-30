@@ -4,7 +4,7 @@ const TrainingLogs: React.FC = () => {
     return (
         <iframe
             src="/test_results.html"
-            style={{ width: '100%', height: '100vh', border: 'none' }}
+            style={{ width: '100%', height: '80vh', border: 'none' }}
             title="Training Logs"
         />
     );
