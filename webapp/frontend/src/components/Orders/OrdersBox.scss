@@ -6,7 +6,7 @@
     border: .5px solid #ccc;
     display: flex;
     flex-direction: column;
-    height: calc(86vh - var(--navbar-height) - var(--hero-height));
+    height: calc(84vh - var(--navbar-height) - var(--hero-height));
 
     @media (max-width: 768px) {
         width: 100%;
@@ -93,4 +93,19 @@
             border-top: .5px solid #ccc;
         }
     }
+}
+
+.severity-low {
+    background-color: #155724;
+    color: #d4edda;
+}
+
+.severity-medium {
+    background-color: #856404;
+    color: #fff3cd;
+}
+
+.severity-high {
+    background-color: #721c24;
+    color: #f8d7da;
 }
