@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { Order } from './types/order';  // Ensure this type is defined in your project according to your needs
+import { Order } from '../types/order';
 
 interface WebSocketContextType {
     regularOrders: Order[];
@@ -24,7 +24,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
         };
 
         ws.onmessage = (event) => {
-            // console.log("Received message:", event.data);
             try {
                 const data = JSON.parse(event.data);
                 if (data.is_spoofing) {
@@ -42,8 +41,8 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
             console.log('WebSocket Disconnected');
         };
 
-        ws.onerror = (error) => {
-            console.log('WebSocket Error:', error);
+        ws.onerror = (event) => {
+            console.error('WebSocket Error:', event);
         };
 
         return () => {

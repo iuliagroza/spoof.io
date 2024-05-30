@@ -11,7 +11,7 @@ const Hero: React.FC<{ setHeroHeight: (height: number) => void }> = ({ setHeroHe
     }, [setHeroHeight]);
 
     return (
-        <div className="Hero" ref={heroRef}>
+        <div className="hero" ref={heroRef}>
             <div className="Hero-content">
                 <h1 className="Hero-title">Secure Your LUNA Transactions Against Spoofing</h1>
                 <p className="Hero-description">

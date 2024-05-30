@@ -1,6 +1,6 @@
 import React from 'react';
 import './OrdersBox.scss';
-import { useWebSocket } from '../../WebSocketContext';
+import { useWebSocket } from '../../websocket/WebSocketContext';
 import TableHeader from './TableHeader';
 
 interface OrdersBoxProps {
