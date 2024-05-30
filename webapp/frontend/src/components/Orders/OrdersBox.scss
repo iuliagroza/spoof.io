@@ -6,7 +6,7 @@
     border: .5px solid #ccc;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - var(--navbar-height) - var(--hero-height) - 50px);
+    height: calc(86vh - var(--navbar-height) - var(--hero-height));
 
     @media (max-width: 768px) {
         width: 100%;
