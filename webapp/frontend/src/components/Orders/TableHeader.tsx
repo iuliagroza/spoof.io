@@ -6,6 +6,13 @@ interface TableHeaderProps {
 }
 
 const TableHeader: React.FC<TableHeaderProps> = ({ type }) => {
+    const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
+        const target = event.target as HTMLElement;
+        if (target.scrollWidth > target.clientWidth) {
+            target.title = target.innerText;
+        }
+    };
+
     return (
         <div className="table-header">
             <table>
@@ -13,21 +20,21 @@ const TableHeader: React.FC<TableHeaderProps> = ({ type }) => {
                     <tr>
                         {type === "spoofing" ? (
                             <>
-                                <th>Detected Spoofed<br />Order ID</th>
-                                <th>Time</th>
-                                <th>Anomaly<br />Score</th>
-                                <th>Spoofing<br />Threshold</th>
+                                <th onMouseEnter={handleMouseEnter}>Detected Spoofed<br />Order ID</th>
+                                <th onMouseEnter={handleMouseEnter}>Time</th>
+                                <th onMouseEnter={handleMouseEnter}>Anomaly<br />Score</th>
+                                <th onMouseEnter={handleMouseEnter}>Spoofing<br />Threshold</th>
                             </>
                         ) : (
                             <>
-                                <th>Order ID</th>
-                                <th>Type</th>
-                                <th>Size</th>
-                                <th>Price</th>
-                                <th>Time</th>
-                                <th>Reason</th>
-                                <th>Remaining<br />Size</th>
-                                <th>Trade ID</th>
+                                <th onMouseEnter={handleMouseEnter}>Order ID</th>
+                                <th onMouseEnter={handleMouseEnter}>Type</th>
+                                <th onMouseEnter={handleMouseEnter}>Size</th>
+                                <th onMouseEnter={handleMouseEnter}>Price</th>
+                                <th onMouseEnter={handleMouseEnter}>Time</th>
+                                <th onMouseEnter={handleMouseEnter}>Reason</th>
+                                <th onMouseEnter={handleMouseEnter}>Remaining<br />Size</th>
+                                <th onMouseEnter={handleMouseEnter}>Trade ID</th>
                             </>
                         )}
                     </tr>
