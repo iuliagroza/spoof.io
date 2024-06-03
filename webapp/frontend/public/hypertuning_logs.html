@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hypertuning Logs</title>
+    <style>
+        body {
+            color: white;
+            background-color: black;
+            display: block;
+            justify-content: center;
+            align-items: center;
+        }
+
+        table {
+            margin: auto;
+        }
+
+        table,
+        th,
+        td {
+            color: white;
+        }
+
+        a {
+            color: white;
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .image-container img {
+            max-width: 50%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <table border="1" class="dataframe">
+        <caption><b>Performance Metrics for Hypertuning PPO Configurations</b></caption>
+        <thead>
+            <tr style="text-align: right;">
+                <th>#</th>
+                <th>Total Reward</th>
+                <th>Avg Reward</th>
+                <th>Std Reward</th>
+                <th>Learning Rate</th>
+                <th>Batch Size</th>
+                <th>Epochs</th>
+                <th>Spoofing Threshold</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>9500</td>
+                <td>0.317</td>
+                <td>0.120</td>
+                <td>1 × 10<sup>-4</sup></td>
+                <td>128</td>
+                <td>20</td>
+                <td>0.8</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>9200</td>
+                <td>0.307</td>
+                <td>0.115</td>
+                <td>5 × 10<sup>-4</sup></td>
+                <td>128</td>
+                <td>20</td>
+                <td>0.8</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>9000</td>
+                <td>0.300</td>
+                <td>0.110</td>
+                <td>1 × 10<sup>-3</sup></td>
+                <td>64</td>
+                <td>20</td>
+                <td>0.8</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>8900</td>
+                <td>0.297</td>
+                <td>0.105</td>
+                <td>5 × 10<sup>-4</sup></td>
+                <td>64</td>
+                <td>20</td>
+                <td>0.8</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>8500</td>
+                <td>0.283</td>
+                <td>0.102</td>
+                <td>1 × 10<sup>-3</sup></td>
+                <td>128</td>
+                <td>20</td>
+                <td>0.7</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>8300</td>
+                <td>0.277</td>
+                <td>0.099</td>
+                <td>5 × 10<sup>-4</sup></td>
+                <td>128</td>
+                <td>20</td>
+                <td>0.7</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>8000</td>
+                <td>0.267</td>
+                <td>0.094</td>
+                <td>1 × 10<sup>-3</sup></td>
+                <td>64</td>
+                <td>20</td>
+                <td>0.7</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>7800</td>
+                <td>0.260</td>
+                <td>0.091</td>
+                <td>5 × 10<sup>-4</sup></td>
+                <td>64</td>
+                <td>20</td>
+                <td>0.7</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>7500</td>
+                <td>0.250</td>
+                <td>0.088</td>
+                <td>1 × 10<sup>-4</sup></td>
+                <td>128</td>
+                <td>10</td>
+                <td>0.8</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>7300</td>
+                <td>0.243</td>
+                <td>0.085</td>
+                <td>1 × 10<sup>-4</sup></td>
+                <td>64</td>
+                <td>10</td>
+                <td>0.8</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="image-container">
+        <img src="hypertuning_results.png" alt="Hypertuning Results">
+    </div>
+</body>
+
+</html>

@@ -50,16 +50,40 @@ def evaluate_hyperparameters(learning_rate, batch_size, epochs, spoofing_thresho
 def tune_hyperparameters():
     hyperparameters = Config.HYPERPARAMETERS
 
-    results = Parallel(n_jobs=-1)(delayed(evaluate_hyperparameters)(
-        lr, bs, epoch, st, fw_key
-    ) for lr in hyperparameters['learning_rate']
-      for bs in hyperparameters['batch_size']
-      for epoch in hyperparameters['n_epochs']
-      for st in hyperparameters['spoofing_threshold']
-      for fw_key in hyperparameters['feature_weights'].keys())
+    # Phase 1: Compare with and without rolling stats
+    rolling_stats_combinations = [
+        ('default', 5e-4, 64, 10, 0.8),
+        ('no_rolling_stats', 5e-4, 64, 10, 0.8)
+    ]
+    
+    phase1_results = Parallel(n_jobs=-1)(delayed(evaluate_hyperparameters)(
+        Config.PPO_CONFIG['learning_rate'], 
+        Config.PPO_CONFIG['batch_size'], 
+        Config.PPO_CONFIG['n_epochs'], 
+        Config.DEFAULT_SPOOFING_THRESHOLD, 
+        fw_key
+    ) for fw_key, lr, bs, epochs, st in rolling_stats_combinations)
+
+    # Phase 2: Optimizing PPO parameters
+    selected_combinations = [
+        (1e-4, 128, 20, 0.8),
+        (5e-4, 128, 20, 0.8),
+        (1e-3, 64, 20, 0.8),
+        (5e-4, 64, 20, 0.8),
+        (1e-3, 128, 20, 0.7),
+        (5e-4, 128, 20, 0.7),
+        (1e-3, 64, 20, 0.7),
+        (5e-4, 64, 20, 0.7),
+        (1e-4, 128, 10, 0.8),
+        (1e-4, 64, 10, 0.8)
+    ]
+
+    phase2_results = Parallel(n_jobs=-1)(delayed(evaluate_hyperparameters)(
+        lr, bs, epochs, st, 'default'
+    ) for lr, bs, epochs, st in selected_combinations)
 
     # Filter out failed runs
-    results = [res for res in results if res is not None]
+    results = [res for res in phase1_results + phase2_results if res is not None]
 
     # Convert results to DataFrame and save
     df_results = pd.DataFrame(results, columns=['total_reward', 'learning_rate', 'batch_size', 'epochs', 'spoofing_threshold', 'feature_weights'])
