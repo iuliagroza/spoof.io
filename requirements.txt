@@ -8,3 +8,4 @@ channels
 channels_redis
 daphne
 django-cors-headers
+pytest

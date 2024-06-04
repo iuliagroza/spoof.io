@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './OrdersBox.scss';
 import { useWebSocket } from '../../websocket/WebSocketContext';
 import TableHeader from './TableHeader';
@@ -24,11 +24,29 @@ const OrdersBox: React.FC<OrdersBoxProps> = ({ type, className }) => {
     const { regularOrders, spoofingOrders } = useWebSocket();
     const orders = type === "spoofing" ? spoofingOrders : regularOrders;
 
+    const [copied, setCopied] = useState(false);
+    const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+
     const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
         const target = event.target as HTMLElement;
         if (target.scrollWidth > target.clientWidth) {
             target.title = target.innerText;
         }
+    };
+
+    const handleRowClick = (event: React.MouseEvent<HTMLTableRowElement>) => {
+        const target = event.currentTarget as HTMLTableRowElement;
+        const cells = Array.from(target.querySelectorAll('td'));
+        const rowText = cells.map(cell => cell.innerText).join('; ');
+
+        setPopupPosition({ x: event.clientX, y: event.clientY });
+
+        navigator.clipboard.writeText(rowText).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000); // Show message for 2 seconds
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+        });
     };
 
     return (
@@ -43,7 +61,7 @@ const OrdersBox: React.FC<OrdersBoxProps> = ({ type, className }) => {
                             const severityClass = type === "spoofing" ? getSeverityClass(anomalyScore, spoofingThreshold) : '';
 
                             return (
-                                <tr key={index} className={severityClass}>
+                                <tr key={index} className={severityClass} onClick={handleRowClick}>
                                     <td onMouseEnter={handleMouseEnter}>{order.order_id ?? 'N/A'}</td>
                                     {type === "spoofing" ? (
                                         <>
@@ -67,6 +85,14 @@ const OrdersBox: React.FC<OrdersBoxProps> = ({ type, className }) => {
                         })}
                     </tbody>
                 </table>
+                {copied && (
+                    <div
+                        className="copied-popup"
+                        style={{ top: `${popupPosition.y}px`, left: `${popupPosition.x}px` }}
+                    >
+                        Copied to clipboard
+                    </div>
+                )}
             </div>
         </div>
     );

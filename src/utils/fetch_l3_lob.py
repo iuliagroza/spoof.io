@@ -117,7 +117,6 @@ def on_pong(ws, message):
 
 
 if __name__ == "__main__":
-    # Create a WebSocketApp object
     ws = websocket.WebSocketApp(
         SOCKET_URL,
         on_open=on_open,
@@ -128,5 +127,4 @@ if __name__ == "__main__":
         on_pong=on_pong
     )
 
-    # Run the WebSocket
     ws.run_forever()
