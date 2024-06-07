@@ -1,7 +1,7 @@
 import numpy as np
-from src.utils.log_config import setup_logger
-from src.utils.load_csv_data import load_csv_data
-from src.config import Config
+from ppo.utils.log_config import setup_logger
+from ppo.utils.load_csv_data import load_csv_data
+from ppo.config import Config
 
 
 # Set up logging to save environment logs for debugging purposes

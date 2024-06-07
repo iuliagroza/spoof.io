@@ -3,10 +3,10 @@ from torch.distributions import Categorical
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from src.market_env import MarketEnvironment
-from src.ppo_policy_network import PPOPolicyNetwork
-from src.utils.log_config import setup_logger
-from src.config import Config
+from ppo.market_env import MarketEnvironment
+from ppo.ppo_policy_network import PPOPolicyNetwork
+from ppo.utils.log_config import setup_logger
+from ppo.config import Config
 
 
 # Set up logging to save environment logs for debugging purposes

@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.distributions import Categorical
-from src.utils.log_config import setup_logger
-from src.config import Config
-from src.market_env import MarketEnvironment
+from ppo.utils.log_config import setup_logger
+from ppo.config import Config
+from ppo.market_env import MarketEnvironment
 
 
 # Set up logging to save environment logs for debugging purposes

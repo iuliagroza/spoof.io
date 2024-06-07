@@ -1,7 +1,7 @@
 import pandas as pd
 import os
-from src.utils.log_config import setup_logger
-from src.config import Config
+from ppo.utils.log_config import setup_logger
+from ppo.config import Config
 
 
 logger = setup_logger('save_data')

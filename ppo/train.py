@@ -1,10 +1,10 @@
 import torch
 from torch.distributions import Categorical
 from torch import optim
-from src.config import Config
-from src.market_env import MarketEnvironment
-from src.ppo_policy_network import PPOPolicyNetwork, ppo_update, get_discounted_rewards, compute_advantages
-from src.utils.log_config import setup_logger
+from ppo.config import Config
+from ppo.market_env import MarketEnvironment
+from ppo.ppo_policy_network import PPOPolicyNetwork, ppo_update, get_discounted_rewards, compute_advantages
+from ppo.utils.log_config import setup_logger
 
 
 # Set up logging to save environment logs for debugging purposes

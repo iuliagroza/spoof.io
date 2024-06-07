@@ -2,12 +2,12 @@ import torch
 from torch import optim
 import pandas as pd
 from joblib import Parallel, delayed
-from src.config import Config
-from src.market_env import MarketEnvironment
-from src.ppo_policy_network import PPOPolicyNetwork
-from src.utils.log_config import setup_logger
-from src.train import train_model
-from src.test import test_model, save_plots
+from ppo.config import Config
+from ppo.market_env import MarketEnvironment
+from ppo.ppo_policy_network import PPOPolicyNetwork
+from ppo.utils.log_config import setup_logger
+from ppo.train import train_model
+from ppo.test import test_model, save_plots
 
 logger = setup_logger('hypertuning', Config.LOG_TRAIN_PATH)
 

@@ -1,5 +1,5 @@
 import logging
-from src.config import Config
+from ppo.config import Config
 
 
 def setup_logger(name, filepath=None, file_log_level=None):

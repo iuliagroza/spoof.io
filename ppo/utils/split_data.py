@@ -1,5 +1,5 @@
 import pandas as pd
-from src.config import Config
+from ppo.config import Config
 
 def split_data(file_path, save_path):
     data = pd.read_csv(file_path)
