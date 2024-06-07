@@ -1,7 +1,7 @@
-from torch.distributions import Categorical
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.distributions import Categorical
 from src.utils.log_config import setup_logger
 from src.config import Config
 from src.market_env import MarketEnvironment
@@ -33,19 +33,19 @@ class PPOPolicyNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(256, num_actions)
         )
+        self.softmax = nn.Softmax(dim=-1)
+        self.init_weights()
+
+    def init_weights(self):
+        for layer in self.layers:
+            if isinstance(layer, nn.Linear):
+                nn.init.kaiming_normal_(layer.weight, mode='fan_in', nonlinearity='relu')
+                nn.init.constant_(layer.bias, 0)
 
     def forward(self, x):
-        """
-        Forward pass of the network.
-
-        Args:
-            x (torch.Tensor): The input tensor containing feature data.
-
-        Returns:
-            torch.Tensor: The output tensor containing the action logits.
-        """
-        return self.layers(x)
-
+        logits = self.layers(x)
+        action_probs = self.softmax(logits)
+        return logits, action_probs
 
 def get_discounted_rewards(rewards, gamma):
     """
@@ -106,8 +106,8 @@ def ppo_update(network, optimizer, states, actions, old_log_probs, advantages, r
         float: The loss value computed during the PPO update.
     """
     try:
-        logits = network(states)
-        dist = Categorical(logits=logits)
+        logits, action_probs = network(states)
+        dist = Categorical(probs=action_probs)
         new_log_probs = dist.log_prob(actions)
         entropy = dist.entropy().mean()
         ratios = torch.exp(new_log_probs - old_log_probs.detach())
@@ -115,13 +115,23 @@ def ppo_update(network, optimizer, states, actions, old_log_probs, advantages, r
         surr1 = ratios * advantages
         surr2 = torch.clamp(ratios, 1 - clip_param, 1 + clip_param) * advantages
         actor_loss = -torch.min(surr1, surr2).mean()
-        critic_loss = 0.5 * (returns - dist.probs.mean()).pow(2).mean()  # ensure probs are never zero
+        critic_loss = 0.5 * (returns - action_probs.mean()).pow(2).mean()
         loss = actor_loss + critic_loss - Config.PPO_CONFIG['ent_coef'] * entropy
 
         optimizer.zero_grad()
         loss.backward()
         torch.nn.utils.clip_grad_norm_(network.parameters(), Config.PPO_CONFIG['max_grad_norm'])
         optimizer.step()
+
+        # Log intermediate values for debugging
+        logger.debug(f"logits: {logits}")
+        logger.debug(f"action_probs: {action_probs}")
+        logger.debug(f"new_log_probs: {new_log_probs}")
+        logger.debug(f"ratios: {ratios}")
+        logger.debug(f"advantages: {advantages}")
+        logger.debug(f"actor_loss: {actor_loss}")
+        logger.debug(f"critic_loss: {critic_loss}")
+        logger.debug(f"entropy: {entropy}")
 
         return loss.item()
     except Exception as e:
@@ -143,12 +153,13 @@ if __name__ == "__main__":
         state = env.reset()
         if state is not None:
             state = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
+            state = (state - state.mean()) / (state.std() + 1e-8)  # Normalize the input state
         done = False
         while not done and state is not None:
             log_probs, values, rewards, states, actions, anomaly_scores, spoofing_thresholds = [], [], [], [], [], [], []
             for _ in range(Config.PPO_CONFIG['n_steps']):
-                logits = network(state)
-                dist = Categorical(logits=logits)
+                logits, action_probs = network(state)
+                dist = Categorical(probs=action_probs)
                 action = dist.sample()
                 log_prob = dist.log_prob(action)
                 value = logits.mean()
@@ -158,9 +169,10 @@ if __name__ == "__main__":
                 log_probs.append(log_prob)
                 values.append(value)
 
-                state, reward, done, anomaly_score, spoofing_threshold = env.step(action.item())
+                state, transaction_data, reward, done, anomaly_score, spoofing_threshold = env.step(action.item())
                 if state is not None:
                     state = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
+                    state = (state - state.mean()) / (state.std() + 1e-8)  # Normalize the input state
                 rewards.append(reward)
                 anomaly_scores.append(anomaly_score)
                 spoofing_thresholds.append(spoofing_threshold)
@@ -175,9 +187,9 @@ if __name__ == "__main__":
 
             # Convert lists to tensors
             states = torch.cat(states)
-            actions = torch.tensor(actions)
-            log_probs = torch.tensor(log_probs)
-            returns = torch.tensor(discounted_rewards[:-1])  # exclude the last next_value
+            actions = torch.cat(actions)
+            log_probs = torch.cat(log_probs)
+            returns = torch.tensor(discounted_rewards[:-1])  # Exclude the last next_value
             advantages = torch.tensor(advantages)
 
             loss = ppo_update(network, optimizer, states, actions, log_probs, advantages, returns, Config.PPO_CONFIG['clip_range'])

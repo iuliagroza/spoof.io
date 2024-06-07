@@ -123,7 +123,7 @@ async def simulate_market_data():
     full_channel_data = pd.read_csv(Config.FULL_CHANNEL_SIM_PATH)
     ticker_data = pd.read_csv(Config.TICKER_SIM_PATH)
 
-    # Convert 'time' to datetime and sort by it if necessary
+    # Convert 'time' to datetime
     full_channel_data['time'] = pd.to_datetime(full_channel_data['time'])
     ticker_data['time'] = pd.to_datetime(ticker_data['time'])
 

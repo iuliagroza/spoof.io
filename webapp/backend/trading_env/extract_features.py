@@ -1,4 +1,3 @@
-import pandas as pd
 from trading_env.utils.log_config import setup_logger
 from trading_env.utils.load_csv_data import load_csv_data
 from trading_env.utils.save_data import save_data

@@ -4,7 +4,7 @@ import pandas as pd
 from joblib import Parallel, delayed
 from src.config import Config
 from src.market_env import MarketEnvironment
-from src.ppo_policy_network import PPOPolicyNetwork, ppo_update, get_discounted_rewards, compute_advantages
+from src.ppo_policy_network import PPOPolicyNetwork
 from src.utils.log_config import setup_logger
 from src.train import train_model
 from src.test import test_model, save_plots
@@ -38,7 +38,6 @@ def evaluate_hyperparameters(learning_rate, batch_size, epochs, spoofing_thresho
         total_reward = data['rewards'].sum()
         logger.info(f"Total Reward for combination LR={learning_rate}, Batch Size={batch_size}, Epochs={epochs}, Spoofing Threshold={spoofing_threshold}, Feature Weights={feature_weights_key}: {total_reward}")
 
-        # Save plots including loss data
         save_plots(data, loss_data)
         
         return total_reward, learning_rate, batch_size, epochs, spoofing_threshold, feature_weights_key

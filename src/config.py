@@ -67,23 +67,35 @@ class Config:
     DEFAULT_SPOOFING_THRESHOLD = 0.8  # Default spoofing threshold for normal runs
     HISTORY_WINDOW_SIZE = 10
     FEATURE_WEIGHTS = {  # Feature weights used in anomaly score calculations
-        'order_flow_imbalance': 0.15,
-        'cancel_to_received_ratio': 0.15,
-        'price_5_std': 0.05,
-        'price_10_std': 0.05,
-        'price_15_std': 0.05,
-        'size_5_var': 0.05,
-        'size_10_var': 0.05,
-        'size_15_var': 0.05,
-        'spread': 0.10,
-        'last_size_5_var': 0.05,
-        'last_size_10_var': 0.05,
-        'hour_of_day': 0.15,  # Higher weight as temporal context is crucial
-        'hour_15': 0.025,
-        'hour_16': 0.025,
-        'hour_17': 0.025,
-        'hour_18': 0.025,
-        'hour_19': 0.025
+        'default': {'order_flow_imbalance': 0.15,
+            'cancel_to_received_ratio': 0.15,
+            'price_5_std': 0.05,
+            'price_10_std': 0.05,
+            'price_15_std': 0.05,
+            'size_5_var': 0.05,
+            'size_10_var': 0.05,
+            'size_15_var': 0.05,
+            'spread': 0.10,
+            'last_size_5_var': 0.05,
+            'last_size_10_var': 0.05,
+            'hour_of_day': 0.15,
+            'hour_15': 0.05,
+            'hour_16': 0.05,
+            'hour_17': 0.05,
+            'hour_18': 0.05,
+            'hour_19': 0.05
+        },
+        'no_rolling_stats': {  # Exclude rolling statistics
+            'order_flow_imbalance': 0.25,
+            'cancel_to_received_ratio': 0.25,
+            'spread': 0.10,
+            'hour_of_day': 0.15,
+            'hour_15': 0.25,
+            'hour_16': 0.25,
+            'hour_17': 0.25,
+            'hour_18': 0.25,
+            'hour_19': 0.25
+        }
     }
     TRAIN_TEST_SPLIT_RATIO = 0.7 # Training configuration
     RANDOM_SEED = 42  # Seed for any random operations to ensure reproducibility
@@ -94,10 +106,10 @@ class Config:
 
     # PPO Model Parameters
     PPO_CONFIG = {
-        'learning_rate': 2.5e-4,
-        'n_steps': 2048,
-        'batch_size': 64,
-        'n_epochs': 10,
+        'learning_rate': 1e-3,
+        'n_steps': 200,
+        'batch_size': 128,
+        'n_epochs': 30,
         'gamma': 0.99,
         'gae_lambda': 0.95,
         'clip_range': 0.2,

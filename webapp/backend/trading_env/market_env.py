@@ -160,9 +160,9 @@ if __name__ == "__main__":
     env = MarketEnvironment()
     state = env.reset()
     while not env.done:
-        action = np.random.choice([0, 1])  # Randomly choose action
+        action = np.random.choice([0, 1])
         try:
-            state, reward, done, anomaly_score, spoofing_threshold = env.step(action)
+            state, transaction_data, reward, done, anomaly_score, spoofing_threshold = env.step(action)
             logger.info(f"Action: {action}, Reward: {reward}, Anomaly Score: {anomaly_score}, Spoofing Threshold: {spoofing_threshold}")
             if done:
                 logger.info("Simulation ended.")

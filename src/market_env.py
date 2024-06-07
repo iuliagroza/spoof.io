@@ -36,6 +36,7 @@ class MarketEnvironment:
         self.current_index = max(initial_index, Config.HISTORY_WINDOW_SIZE)
         self.done = False
         self.spoofing_threshold = Config.DEFAULT_SPOOFING_THRESHOLD  # Initialize dynamic thresholding
+        self.feature_weights = Config.FEATURE_WEIGHTS['default']  # Initialize feature weights
         self.update_threshold()
 
     def split_data(self, train):
@@ -93,7 +94,9 @@ class MarketEnvironment:
 
             self.current_index += 1
             next_state = self.get_state() if not self.done else None
-            return next_state, reward, self.done, anomaly_score, self.spoofing_threshold
+            transaction_data = self.full_channel_data.iloc[self.current_index].to_dict() if not self.done else None
+
+            return next_state, transaction_data, reward, self.done, anomaly_score, self.spoofing_threshold
         except Exception as e:
             logger.error(f"An error occurred during the environment step: {e}")
             raise Exception(f"Step processing failed: {e}")
@@ -106,13 +109,14 @@ class MarketEnvironment:
             np.array: Concatenated array of historical market features, ensuring all data types are floats.
         """
         try:
-            full_channel_features = self.full_channel_data.iloc[
+            # Select only numeric columns
+            full_channel_features = self.full_channel_data.select_dtypes(include=[float, int]).iloc[
                 self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index
-            ].astype(float).values.flatten()
+            ].values.flatten()
 
-            ticker_features = self.ticker_data.iloc[
+            ticker_features = self.ticker_data.select_dtypes(include=[float, int]).iloc[
                 self.current_index - Config.HISTORY_WINDOW_SIZE:self.current_index
-            ].astype(float).values.flatten()
+            ].values.flatten()
 
             return np.concatenate([full_channel_features, ticker_features])
         except Exception as e:
@@ -132,8 +136,8 @@ class MarketEnvironment:
         try:
             full_row = self.full_channel_data.iloc[index]
             ticker_row = self.ticker_data.iloc[index]
-            scores = {feature: np.log1p(abs(row[feature])) for row in (full_row, ticker_row) for feature in Config.FEATURE_WEIGHTS if feature in row}
-            return sum(Config.FEATURE_WEIGHTS.get(k, 0) * v for k, v in scores.items())
+            scores = {feature: np.log1p(abs(row[feature])) for row in (full_row, ticker_row) for feature in self.feature_weights if feature in row}
+            return sum(self.feature_weights.get(k, 0) * v for k, v in scores.items())
         except Exception as e:
             logger.error(f"Error calculating anomaly score at index {index}: {e}")
             raise Exception(f"Anomaly score calculation failed: {e}")
@@ -155,9 +159,9 @@ if __name__ == "__main__":
     env = MarketEnvironment()
     state = env.reset()
     while not env.done:
-        action = np.random.choice([0, 1])  # Randomly choose action
+        action = np.random.choice([0, 1])
         try:
-            state, reward, done, anomaly_score, spoofing_threshold = env.step(action)
+            state, transaction_data, reward, done, anomaly_score, spoofing_threshold = env.step(action)
             logger.info(f"Action: {action}, Reward: {reward}, Anomaly Score: {anomaly_score}, Spoofing Threshold: {spoofing_threshold}")
             if done:
                 logger.info("Simulation ended.")
