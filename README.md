@@ -10,7 +10,7 @@
    $ cd webapp/backend
    $ redis-server
    ```
-2. Run simulation server
+2. Run market environment simulation server
    ```bash
    $ cd webapp/backend
    $ daphne -p 8000 backend.asgi:application
